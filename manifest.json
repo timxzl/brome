@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+
+  "name": "Bing Rewards Helper",
+  "description": "Helps with Bing log on and auto search",
+  "version": "1.0",
+
+  "icons": { "128": "icon.png" },
+
+  "background": {
+    "persistent": false,
+    "scripts": ["background.js"]
+  },
+
+  "permissions": [
+    "alarms",
+    "tabs",
+    "http://www.bing.com/",
+    "https://login.live.com/",
+    "https://account.live.com/"
+  ],
+  "browser_action": {
+    "default_title": "Bing Rewards Helper",
+    "default_icon": "icon.png"
+  }
+}
