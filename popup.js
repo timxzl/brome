@@ -34,16 +34,24 @@ MVC.prototype.applyChange = function(elm) {
 	var needRefresh = false;
 
 	if (index < accounts.length) {
-		accounts[index][field] = elm.value;
+		const value = elm.value;
+		if (value.length == 0 && field=='email') {
+			accounts.splice(index,1);
+			needRefresh = true;
+		} else{
+			accounts[index][field] = value;
+		}
 	} else {
-		item = {};
-		item[field] = elm.value;
+		if (field != 'pass') {
+			return;
+		}
+		e = document.getElementById('email' + index);
+		item = {email: e.value, pass: elm.value};
 		accounts.push(item);
 		needRefresh = true;
 	}
 
 	this.saveData();
-
 
 	if (needRefresh) {
 		this.refresh();
@@ -67,10 +75,10 @@ MVC.prototype.refresh = function() {
 		var colCheck = document.createElement('td');
 		var colEmail = document.createElement('td');
 		var colPass = document.createElement('td');
-		var colDel = document.createElement('td');
 
 		var emailbox = document.createElement('input');
 		emailbox.type = 'text';
+		emailbox.readOnly = (i<n);
 		emailbox.id = 'email' + i;
 		emailbox.index = i;
 		emailbox.field = 'email';
@@ -78,9 +86,18 @@ MVC.prototype.refresh = function() {
 		emailbox.onchange = function() {
 			me.applyChange(this);
 		}
+		if (i<n) {
+			emailbox.onblur = function() {
+				this.readOnly = true;
+			}
+		}
+		emailbox.ondblclick = function() {
+			this.readOnly = false;
+		}
 		colEmail.appendChild(emailbox);
 
 		var passbox = document.createElement('input');
+		passbox.readOnly = (i<n);
 		passbox.type = 'password';
 		passbox.id = 'pass' + i;
 		passbox.index = i;
@@ -88,6 +105,14 @@ MVC.prototype.refresh = function() {
 		passbox.value = pass;
 		passbox.onchange = function() {
 			me.applyChange(this);
+		}
+		passbox.ondblclick = function() {
+			this.readOnly = false;
+		}
+		if (i<n) {
+			passbox.onblur = function() {
+				this.readOnly = true;
+			}
 		}
 		colPass.appendChild(passbox);
 
@@ -97,17 +122,11 @@ MVC.prototype.refresh = function() {
 			checkbox.type = 'checkbox';
 			checkbox.id = 'check' + i;
 			colCheck.appendChild(checkbox);
-
-			var del = document.createElement('input');
-			del.type = 'button';
-			del.value = 'X';
-			colDel.appendChild(del);
 		}
 
 		row.appendChild(colCheck);
 		row.appendChild(colEmail);
 		row.appendChild(colPass);
-		row.appendChild(colDel);
 		tab.appendChild(row);
 	}
 }
