@@ -144,8 +144,10 @@ MVC.prototype.refreshView = function() {
 }
 
 MVC.prototype.setView = function(view) {
-	this.view = view;
-	this.refreshView();
+	if (view != this.view) {
+		this.view = view;
+		this.refreshView();
+	}
 }
 
 MVC.prototype.loadData = function() {

@@ -1,6 +1,16 @@
-const bg = chrome.extension.getBackgroundPage();
-const mvc = bg.mvc;
+var mvc = null;
+var view = null;
 
-window.onload =  function() {
-	mvc.setView(document);
+chrome.runtime.getBackgroundPage(function(bg) {
+	mvc = bg.mvc;
+	if (view) {
+		mvc.setView(view);
+	}
+});
+
+window.onload = function() {
+	view = document;
+	if (mvc) {
+		mvc.setView(document);
+	}
 }
