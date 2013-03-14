@@ -8,9 +8,10 @@ function clearTab(tab) {
 }
 
 
+function MVC() {
 // view: document
 // accounts: [{email, pass}]
-function MVC() {}
+}
 
 MVC.prototype.saveData = function() {
 	storage.set({accounts: this.accounts});
@@ -42,7 +43,7 @@ MVC.prototype.applyChange = function(elm) {
 		if (field != 'pass') {
 			return;
 		}
-		e = view.getElementById('email' + index);
+		e = this.view.getElementById('email' + index);
 		item = {email: e.value, pass: elm.value};
 		accounts.push(item);
 		needRefresh = true;
@@ -51,7 +52,8 @@ MVC.prototype.applyChange = function(elm) {
 	this.saveData();
 
 	if (needRefresh) {
-		this.refresh();
+		// TODO: refresh tab or the whole view?
+		this.refreshTab();
 	}
 }
 
