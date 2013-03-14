@@ -7,10 +7,21 @@ function clearTab(tab) {
 	}
 }
 
+function setReadOnly(v) {
+	return function () {
+		this.readOnly = v;
+	}
+}
+
 
 function MVC() {
 // view: document
 // accounts: [{email, pass}]
+	this.cur = 0;
+	this.gap_low = 1;
+	this.gap_high = 5;
+	this.iters = 32;
+	this.wait = 7;
 }
 
 MVC.prototype.saveData = function() {
@@ -43,7 +54,7 @@ MVC.prototype.applyChange = function(elm) {
 		if (field != 'pass') {
 			return;
 		}
-		e = this.view.getElementById('email' + index);
+		e = elm.parentElement.previousSibling.firstChild;
 		item = {email: e.value, pass: elm.value};
 		accounts.push(item);
 		needRefresh = true;
@@ -73,6 +84,7 @@ MVC.prototype.refreshTab = function() {
 		var pass = account.pass ? account.pass : '';
 
 		var row = view.createElement('tr');
+		var colStatus = view.createElement('td');
 		var colCheck = view.createElement('td');
 		var colEmail = view.createElement('td');
 		var colPass = view.createElement('td');
@@ -87,15 +99,7 @@ MVC.prototype.refreshTab = function() {
 		emailbox.onchange = function() {
 			me.applyChange(this);
 		}
-		if (i<n) {
-			emailbox.onblur = function() {
-				this.readOnly = true;
-			}
-		}
-		emailbox.ondblclick = function() {
-			this.readOnly = false;
-		}
-		colEmail.appendChild(emailbox);
+		emailbox.ondblclick = setReadOnly(false);
 
 		var passbox = view.createElement('input');
 		passbox.readOnly = (i<n);
@@ -107,14 +111,16 @@ MVC.prototype.refreshTab = function() {
 		passbox.onchange = function() {
 			me.applyChange(this);
 		}
-		passbox.ondblclick = function() {
-			this.readOnly = false;
-		}
+		passbox.ondblclick = setReadOnly(false);
 		if (i<n) {
-			passbox.onblur = function() {
-				this.readOnly = true;
+			emailbox.onblur = setReadOnly(true);
+			passbox.onblur = setReadOnly(true);
+			if (i == this.cur) {
+				colStatus.innerText = '*';
 			}
 		}
+
+		colEmail.appendChild(emailbox);
 		colPass.appendChild(passbox);
 
 		if (i < n) {
@@ -125,6 +131,7 @@ MVC.prototype.refreshTab = function() {
 			colCheck.appendChild(checkbox);
 		}
 
+		row.appendChild(colStatus);
 		row.appendChild(colCheck);
 		row.appendChild(colEmail);
 		row.appendChild(colPass);
