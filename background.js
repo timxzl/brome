@@ -18,14 +18,18 @@ function MVC() {
 // view: document
 // accounts: [{email, pass}]
 	this.cur = 0;
+	this.runtab = null;
+	this.iters = 33;
+	this.wait_low = 3;
+	this.wait_high = 7;
 	this.gap_low = 1;
 	this.gap_high = 5;
-	this.iters = 32;
-	this.wait = 7;
 }
 
-MVC.prototype.saveData = function() {
-	storage.set({accounts: this.accounts});
+MVC.prototype.saveData = function(key) {
+	const item = {};
+	item[key] = this[key];
+	storage.set(item);
 }
 
 MVC.prototype.onChange = function(elm) {
@@ -60,7 +64,7 @@ MVC.prototype.applyChange = function(elm) {
 		needRefresh = true;
 	}
 
-	this.saveData();
+	this.saveData('accounts');
 
 	if (needRefresh) {
 		// TODO: refresh tab or the whole view?
@@ -116,7 +120,7 @@ MVC.prototype.refreshTab = function() {
 			emailbox.onblur = setReadOnly(true);
 			passbox.onblur = setReadOnly(true);
 			if (i == this.cur) {
-				colStatus.innerText = '*';
+				colStatus.innerText = this.runtab ? '$' : '*';
 			}
 		}
 
@@ -139,8 +143,24 @@ MVC.prototype.refreshTab = function() {
 	}
 }
 
+MVC.prototype.refreshControl = function() {
+	const me = this;
+	const view = this.view;
+	const controls = view.getElementsByClassName('control');
+	for (var i=0; i<controls.length; i++) {
+		var c = controls[i];
+		c.value = this[c.id];
+		c.onchange = function() {
+			const key = this.id;
+			me[key] = this.value;
+			me.saveData(key);
+		}
+	}
+}
+
 MVC.prototype.refreshView = function() {
 	this.refreshTab();
+	this.refreshControl();
 }
 
 MVC.prototype.setView = function(view) {
@@ -153,7 +173,12 @@ MVC.prototype.setView = function(view) {
 MVC.prototype.loadData = function() {
 	const me = this;
 	storage.get(null, function(data) {
-		me.accounts = data.accounts ? data.accounts : [];
+		for (key in data) {
+			me[key] = data[key];
+		}
+		if (!me.accounts) {
+			me.accounts = [];
+		}
 		if (me.view) {
 			me.refreshView();
 		}
