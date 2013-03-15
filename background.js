@@ -80,6 +80,7 @@ MVC.prototype.refreshTab = function() {
 	const accounts = this.accounts;
 	clearTab(tab);
 	const n = accounts.length;
+	const allcheckbox = [];
 	for (var i=0; i <= n; i++) {
 		var account = {};
 		if (i<n) {
@@ -135,6 +136,17 @@ MVC.prototype.refreshTab = function() {
 		checkbox.checked = true;
 		checkbox.type = 'checkbox';
 		checkbox.id = 'check' + i;
+		if (i==n) {
+			checkbox.onchange = function() {
+				console.log('hahaha');
+				const v = this.checked;
+				for (var j=0; j<n; j++) {
+					allcheckbox[j].checked = v;
+				}
+			}
+		} else {
+			allcheckbox.push(checkbox);
+		}
 		colCheck.appendChild(checkbox);
 
 		row.appendChild(colBtn);
