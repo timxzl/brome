@@ -24,6 +24,7 @@ function MVC() {
 	this.wait_high = 7;
 	this.gap_low = 1;
 	this.gap_high = 5;
+	this.accounts = [];
 }
 
 MVC.prototype.saveData = function(key) {
@@ -88,7 +89,7 @@ MVC.prototype.refreshTab = function() {
 		var pass = account.pass ? account.pass : '';
 
 		var row = view.createElement('tr');
-		var colStatus = view.createElement('td');
+		var colBtn = view.createElement('td');
 		var colCheck = view.createElement('td');
 		var colEmail = view.createElement('td');
 		var colPass = view.createElement('td');
@@ -119,23 +120,24 @@ MVC.prototype.refreshTab = function() {
 		if (i<n) {
 			emailbox.onblur = setReadOnly(true);
 			passbox.onblur = setReadOnly(true);
-			if (i == this.cur) {
-				colStatus.innerText = this.runtab ? '$' : '*';
-			}
+			var btn = view.createElement('input');
+			btn.type = 'button';
+			btn.id = 'button' + i;
+			btn.index = i;
+			btn.value = (i==this.cur) ? '*' : ' ';
+			colBtn.appendChild(btn);
 		}
 
 		colEmail.appendChild(emailbox);
 		colPass.appendChild(passbox);
 
-		if (i < n) {
-			var checkbox = view.createElement('input');
-			checkbox.checked = true;
-			checkbox.type = 'checkbox';
-			checkbox.id = 'check' + i;
-			colCheck.appendChild(checkbox);
-		}
+		var checkbox = view.createElement('input');
+		checkbox.checked = true;
+		checkbox.type = 'checkbox';
+		checkbox.id = 'check' + i;
+		colCheck.appendChild(checkbox);
 
-		row.appendChild(colStatus);
+		row.appendChild(colBtn);
 		row.appendChild(colCheck);
 		row.appendChild(colEmail);
 		row.appendChild(colPass);
