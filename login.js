@@ -6,7 +6,7 @@ function login() {
 		delete document.onreadystatechange;
 		const input_email = document.getElementsByName("login")[0];
 		const input_pass = document.getElementsByName("passwd")[0];
-		chrome.getBackgroundPage(function(bg) {
+		chrome.runtime.getBackgroundPage(function(bg) {
 			input_email.value = bg.navi.getEmail();
 			input_pass.value = bg.navi.getPass();
 			const sign_in = document.getElementsByName("SI")[0];
