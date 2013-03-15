@@ -9,7 +9,7 @@
 
   "background": {
     "persistent": false,
-    "scripts": ["background.js"]
+    "scripts": ["background.js", "navigator.js"]
   },
 
   "permissions": [

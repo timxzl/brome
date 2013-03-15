@@ -37,6 +37,12 @@ Navigator.prototype.init = function() {
 			}
 		}
 	}, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]});
+	chrome.extension.onMessage.addListener(function(req, sender, respond) {
+		const tab = sender.tab;
+		if (tab.id == me.tabid && tab.url == login_url) {
+			respond({e: me.email, p:me.pass});
+		}
+	});
 }
 
 Navigator.prototype.run = function(email, pass) {

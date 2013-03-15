@@ -6,9 +6,9 @@ function login() {
 		delete document.onreadystatechange;
 		const input_email = document.getElementsByName("login")[0];
 		const input_pass = document.getElementsByName("passwd")[0];
-		chrome.runtime.getBackgroundPage(function(bg) {
-			input_email.value = bg.navi.getEmail();
-			input_pass.value = bg.navi.getPass();
+		chrome.extension.sendmessage("login", function(r) {
+			input_email.value = r.e;
+			input_pass.value = r.p;
 			const sign_in = document.getElementsByName("SI")[0];
 			sign_in.click();
 		});
