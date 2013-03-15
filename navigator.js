@@ -1,4 +1,4 @@
-const login_url = "https://login.live.com";
+const login_url = "https://login.live.com/";
 const account_url = "https://account.live.com";
 const rewards_url = "http://www.bing.com/rewards";
 
@@ -7,6 +7,8 @@ const login_inject = {"file": "login.js", "runAt": "document_idle"};
 
 const account_inject = {"file": "account.js", "runAt": "document_idle"};
 const rewards_inject = {"file": "rewards.js", "runAt": "document_idle"};
+
+const storage = chrome.storage.local;
 
 function Navigator() {
 	// tabid: int
@@ -19,6 +21,15 @@ Navigator.prototype.getEmail = function() {
 
 Navigator.prototype.getPass = function() {
 	return pass;
+}
+
+Navigator.prototype.save = function() {
+	storage.set({tabid: this.tabid});
+}
+
+
+Navigator.prototype.load = function() {
+	storage.get('tabid', function(data) { if(data) me.tabid = data; });
 }
 
 Navigator.prototype.init = function() {
@@ -39,6 +50,7 @@ Navigator.prototype.init = function() {
 	}, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]});
 	chrome.extension.onMessage.addListener(function(req, sender, respond) {
 		const tab = sender.tab;
+		//alert("req: " + req + " from: " + tab.id + " " + me.tabid + "#" + tab.url + "#" + login_url + "#" + me.email + " " + me.pass + " " + (tab.id==me.tabid) + " " + (tab.url == login_url));
 		if (tab.id == me.tabid && tab.url == login_url) {
 			respond({e: me.email, p:me.pass});
 		}
