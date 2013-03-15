@@ -42,7 +42,6 @@ Navigator.prototype.init = function() {
 		const url = detail.url;
 		if (tabid == me.tabid) {
 			if (url.indexOf(account_url)>=0) {
-				alert('here ' + url);
 				chrome.tabs.executeScript(tabid, account_inject);
 			} else if (url.indexOf(rewards_url)>=0) {
 				chrome.tabs.executeScript(tabid, rewards_inject);
