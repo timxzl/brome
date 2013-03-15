@@ -13,10 +13,6 @@ function Navigator() {
 	// email, pass: string
 }
 
-// Singleton
-const navi = new Navigator();
-navi.init();
-
 Navigator.prototype.getEmail = function() {
 	return email;
 }
@@ -26,6 +22,9 @@ Navigator.prototype.getPass = function() {
 }
 
 Navigator.prototype.init = function() {
+	if (mvc) {
+		mvc.setNavi(this);
+	}
 	const me = this;
 	chrome.webNavigation.onCompleted.addListener(function(detail) {
 		const tabid = detail.tabId;
@@ -50,3 +49,9 @@ Navigator.prototype.run = function(email, pass) {
 		chrome.tabs.executeScript(tabid, login_inject);
 	});
 }
+
+
+// Singleton
+const navi = new Navigator();
+navi.init();
+

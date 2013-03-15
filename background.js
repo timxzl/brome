@@ -230,3 +230,7 @@ MVC.prototype.loadData = function() {
 // Singleton
 const mvc = new MVC();
 mvc.loadData();
+if (navi) {
+	mvc.setNavi(navi);
+}
+
