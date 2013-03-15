@@ -40,11 +40,12 @@ Navigator.prototype.init = function() {
 	chrome.webNavigation.onCompleted.addListener(function(detail) {
 		const tabid = detail.tabId;
 		const url = detail.url;
-		if (tabId == me.tabid) {
+		if (tabid == me.tabid) {
 			if (url.indexOf(account_url)>=0) {
-				chrome.tabs.executeScript(id, account_inject);
+				alert('here ' + url);
+				chrome.tabs.executeScript(tabid, account_inject);
 			} else if (url.indexOf(rewards_url)>=0) {
-				chrome.tabs.executeScript(id, rewards_inject);
+				chrome.tabs.executeScript(tabid, rewards_inject);
 			}
 		}
 	}, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]});
