@@ -16,6 +16,7 @@ function setReadOnly(v) {
 
 function MVC() {
 // view: document
+// navi: Navigator
 // accounts: [{email, pass, checked}]
 	this.cur = 0;
 	this.runtab = null;
@@ -25,6 +26,15 @@ function MVC() {
 	this.gap_low = 1;
 	this.gap_high = 5;
 	this.accounts = [];
+}
+
+MVC.prototype.setNavi = function(nv) {
+	this.navi = nv;
+}
+
+MVC.prototype.run = function(i) {
+	const account = this.accounts[i];
+	this.navi.run(account.email, account.pass);
 }
 
 MVC.prototype.saveData = function(key) {
@@ -130,6 +140,9 @@ MVC.prototype.refreshTab = function() {
 			btn.id = 'button' + i;
 			btn.index = i;
 			btn.value = (i==this.cur) ? '*' : ' ';
+			btn.onclick = function() {
+				me.run(this.index);
+			}
 			colBtn.appendChild(btn);
 		}
 
