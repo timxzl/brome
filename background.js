@@ -16,7 +16,7 @@ function setReadOnly(v) {
 
 function MVC() {
 // view: document
-// accounts: [{email, pass}]
+// accounts: [{email, pass, checked}]
 	this.cur = 0;
 	this.runtab = null;
 	this.iters = 33;
@@ -48,12 +48,16 @@ MVC.prototype.applyChange = function(elm) {
 	var needRefresh = false;
 
 	if (index < accounts.length) {
-		const value = elm.value;
-		if (value.length == 0 && field=='email') {
-			accounts.splice(index,1);
-			needRefresh = true;
-		} else{
-			accounts[index][field] = value;
+		if (elm.field == 'checked') {
+			accounts[index].checked = elm.checked;
+		} else {
+			const value = elm.value;
+			if (value.length == 0 && field=='email') {
+				accounts.splice(index,1);
+				needRefresh = true;
+			} else{
+				accounts[index][field] = value;
+			}
 		}
 	} else {
 		if (field != 'pass') {
@@ -133,18 +137,24 @@ MVC.prototype.refreshTab = function() {
 		colPass.appendChild(passbox);
 
 		var checkbox = view.createElement('input');
-		checkbox.checked = true;
 		checkbox.type = 'checkbox';
 		checkbox.id = 'check' + i;
+		checkbox.index = i;
+		checkbox.field = 'checked';
 		if (i==n) {
 			checkbox.onchange = function() {
-				console.log('hahaha');
 				const v = this.checked;
 				for (var j=0; j<n; j++) {
 					allcheckbox[j].checked = v;
+					accounts[j].checked = v;
 				}
+				me.saveData('accounts');
 			}
 		} else {
+			checkbox.checked = account.checked;
+			checkbox.onchange = function() {
+				me.applyChange(this);
+			}
 			allcheckbox.push(checkbox);
 		}
 		colCheck.appendChild(checkbox);
