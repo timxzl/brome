@@ -59,6 +59,7 @@ Navigator.prototype.init = function() {
 			if (req=="login" && tab.url.indexOf(login_domain)==0) {
 				respond({e: me.email, p:me.pass});
 			} else {
+				//console.log('call updateBalance(' + me.email + ',' + req.balance);
 				mvc.updateBalance(me.email, req.balance);
 			}
 		}

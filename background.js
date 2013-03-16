@@ -47,7 +47,7 @@ MVC.prototype.saveData = function(key) {
 	storage.set(item);
 }
 
-MVC.prototype.updateHistory(index) {
+MVC.prototype.updateHistory = function(index) {
 	const history = accounts[index].history;
 	const view = this.view;
 	for (var i=0; i<history.length; i++) {
@@ -71,15 +71,27 @@ MVC.prototype.updateBalance = function(email, balance) {
 			history = [];
 			accounts[index].history = history;
 		}
-		if (history.length==0 || balance != history[0])) {
+		if (history.length==0 || balance != history[0]) {
+			alert('haha');
 			if (history.length>0 && balance > history[0] && balance < history[0]+5) {
 				history[0] = balance;
-				this.view.getElementById(balanceId(index, 0)).innerHTML = balance;
+				const view = this.view;
+				if (view) {
+					alert('here');
+					const td = view.getElementById(balanceId(index, 0));
+					if (td) {
+						alert('here');
+						td.innerHTML = balance;
+					}
+				}
 			} else {
+				alert('bbb');
 				// insert into 0
 				history.splice(0,0,balance);
 				this.updateHistory(index);
 			}
+			alert('save! ' + index + ' ' + accounts[index].history.length);
+			saveData('accounts');
 		}
 	}
 }
