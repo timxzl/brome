@@ -23,7 +23,7 @@ function MVC() {
 // navi: Navigator
 // accounts: [{email, pass, [balance], checked}]
 	this.cur = 0;
-	this.runtab = null;
+	this.running = false;
 	this.iters = 33;
 	this.wait_low = 3;
 	this.wait_high = 7;
@@ -38,7 +38,10 @@ MVC.prototype.setNavi = function(nv) {
 
 MVC.prototype.run = function(i) {
 	const account = this.accounts[i];
+	this.cur = i;
+	this.running = true;
 	this.navi.run(account.email, account.pass);
+	this.refreshTab();
 }
 
 MVC.prototype.saveData = function(key) {
@@ -203,7 +206,7 @@ MVC.prototype.refreshTab = function() {
 			btn.type = 'button';
 			btn.id = 'button' + i;
 			btn.index = i;
-			btn.value = (i==this.cur) ? '*' : ' ';
+			btn.value = (i==this.cur) ? (this.running ? '$' : '*') : ' ';
 			btn.onclick = function() {
 				me.run(this.index);
 			}
@@ -286,7 +289,6 @@ MVC.prototype.refreshControl = function() {
 	}
 	const runbtn = view.getElementById('run');
 	runbtn.onclick = function() {
-		me.runtab = true;
 		me.refreshTab();
 	}
 }
