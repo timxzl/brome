@@ -236,7 +236,10 @@ MVC.prototype.refreshTab = function() {
 				colHistory.index = i;
 				colHistory.field = "history";
 				colHistory.pos = j;
-				colHistory.innerHTML = (history && history[j]) ? history[j] : "&nbsp &nbsp &nbsp &nbsp";
+				//colHistory.innerHTML = (history && history[j]) ? history[j] : "&nbsp &nbsp &nbsp &nbsp";
+				if (history && history[j]) {
+					colHistory.innerHTML = history[j];
+				}
 				row.appendChild(colHistory);
 			}
 		}
