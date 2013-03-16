@@ -60,6 +60,18 @@ MVC.prototype.updateHistory = function(index) {
 	}
 }
 
+MVC.prototype.clearHistory = function(index) {
+	this.accounts[index].history = [];
+	this.saveData("accounts");
+	const view = this.view;
+	for (var i=0; i<history_len; i++) {
+		var td = view.getElementById(balanceId(index, i));
+		if (td) {
+			td.innerHTML = "";
+		}
+	}
+}
+
 MVC.prototype.updateBalance = function(email, balance) {
 	const accounts = this.accounts;
 	var index = -1;
@@ -242,6 +254,17 @@ MVC.prototype.refreshTab = function() {
 				}
 				row.appendChild(colHistory);
 			}
+			var colClear = view.createElement('td');
+			var btnClear = view.createElement('input');
+			btnClear.type = 'button';
+			btnClear.id = 'btnClear' + i;
+			btnClear.index = i;
+			btnClear.value = 'x';
+			btnClear.onclick = function() {
+				me.clearHistory(this.index);
+			}
+			colClear.appendChild(btnClear);
+			row.appendChild(colClear);
 		}
 
 		tab.appendChild(row);
