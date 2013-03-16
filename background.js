@@ -13,11 +13,15 @@ function setReadOnly(v) {
 	}
 }
 
+function balanceId(index,p) {
+	return "history" + index + ":" + p;
+}
 
+const history_len = 5;
 function MVC() {
 // view: document
 // navi: Navigator
-// accounts: [{email, pass, checked}]
+// accounts: [{email, pass, [balance], checked}]
 	this.cur = 0;
 	this.runtab = null;
 	this.iters = 33;
@@ -41,6 +45,43 @@ MVC.prototype.saveData = function(key) {
 	const item = {};
 	item[key] = this[key];
 	storage.set(item);
+}
+
+MVC.prototype.updateHistory(index) {
+	const history = accounts[index].history;
+	const view = this.view;
+	for (var i=0; i<history.length; i++) {
+		var td = view.getElementById(balanceId(index, i));
+		td.innerHTML = history[i];
+	}
+}
+
+MVC.prototype.updateBalance = function(email, balance) {
+	const accounts = this.accounts;
+	var index = -1;
+	for (var i=0; i<accounts.length; i++) {
+		if (accounts[i].email == email) {
+			index = i;
+			break;
+		}
+	}
+	if (index >= 0) {
+		history = accounts[index].history;
+		if (!history) {
+			history = [];
+			accounts[index].history = history;
+		}
+		if (history.length==0 || balance != history[0])) {
+			if (history.length>0 && balance > history[0] && balance < history[0]+5) {
+				history[0] = balance;
+				this.view.getElementById(balanceId(index, 0)).innerHTML = balance;
+			} else {
+				// insert into 0
+				history.splice(0,0,balance);
+				this.updateHistory(index);
+			}
+		}
+	}
 }
 
 MVC.prototype.onChange = function(elm) {
@@ -176,6 +217,18 @@ MVC.prototype.refreshTab = function() {
 		row.appendChild(colCheck);
 		row.appendChild(colEmail);
 		row.appendChild(colPass);
+		if (i<n) {
+			for (var j=0; j<history_len; j++) {
+				var colHistory = view.createElement('td');
+				colHistory.id = balanceId(i,j);
+				colHistory.index = i;
+				colHistory.field = "history";
+				colHistory.pos = j;
+				colHistory.innerHTML = "&nbsp &nbsp &nbsp &nbsp";
+				row.appendChild(colHistory);
+			}
+		}
+
 		tab.appendChild(row);
 	}
 }

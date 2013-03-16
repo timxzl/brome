@@ -1,13 +1,12 @@
 var done = false;
 
-console.log("here");
-
-function search() {
+function main() {
 	if (!done && document.readyState == "complete") {
 		done = true;
-		delete document.onreadystatechange;
+		const bal = parseInt(document.getElementById("id_rc").innerText);
+		chrome.extension.sendMessage({balance: bal});
 	}
 }
 
-document.onreadystatechange = search;
-search();
+document.onreadystatechange = main;
+main();
