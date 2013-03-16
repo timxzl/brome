@@ -85,9 +85,9 @@ MVC.prototype.updateBalance = function(email, balance) {
 					}
 				}
 			} else {
-				alert('bbb');
 				// insert into 0
 				history.splice(0,0,balance);
+				alert('bbb' + this.accounts[index].history.length);
 				this.updateHistory(index);
 			}
 			alert('save! ' + index + ' ' + accounts[index].history.length);
