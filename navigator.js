@@ -74,7 +74,15 @@ Navigator.prototype.init = function() {
 				});
 			} else {
 				//console.log('call updateBalance(' + me.email + ',' + req.balance);
-				mvc.updateBalance(me.email, req.balance);
+				alert('pending ' + me.pendingRefresh);
+				if (me.pendingRefresh>0) {
+					me.pendingRefresh--;
+					chrome.tabs.reload(tabid, {bypassCache: false}, function() {
+						chrome.tabs.executeScript(tabid, rewards_inject);
+					});
+				} else {
+					mvc.updateBalance(me.email, req.balance);
+				}
 			}
 		}
 	});
