@@ -74,7 +74,7 @@ Navigator.prototype.init = function() {
 				});
 			} else {
 				//console.log('call updateBalance(' + me.email + ',' + req.balance);
-				alert('pending ' + me.pendingRefresh);
+				//alert('pending ' + me.pendingRefresh);
 				if (me.pendingRefresh>0) {
 					me.pendingRefresh--;
 					chrome.tabs.reload(tabid, {bypassCache: false}, function() {
