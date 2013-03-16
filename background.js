@@ -48,11 +48,15 @@ MVC.prototype.saveData = function(key) {
 }
 
 MVC.prototype.updateHistory = function(index) {
-	const history = accounts[index].history;
 	const view = this.view;
-	for (var i=0; i<history.length; i++) {
-		var td = view.getElementById(balanceId(index, i));
-		td.innerHTML = history[i];
+	if (view) {
+		const history = this.accounts[index].history;
+		for (var i=0; i<history.length; i++) {
+			var td = view.getElementById(balanceId(index, i));
+			if (td) {
+				td.innerHTML = history[i];
+			}
+		}
 	}
 }
 
@@ -72,26 +76,21 @@ MVC.prototype.updateBalance = function(email, balance) {
 			accounts[index].history = history;
 		}
 		if (history.length==0 || balance != history[0]) {
-			alert('haha');
 			if (history.length>0 && balance > history[0] && balance < history[0]+5) {
 				history[0] = balance;
 				const view = this.view;
 				if (view) {
-					alert('here');
 					const td = view.getElementById(balanceId(index, 0));
 					if (td) {
-						alert('here');
 						td.innerHTML = balance;
 					}
 				}
 			} else {
 				// insert into 0
 				history.splice(0,0,balance);
-				alert('bbb' + this.accounts[index].history.length);
 				this.updateHistory(index);
 			}
-			alert('save! ' + index + ' ' + accounts[index].history.length);
-			saveData('accounts');
+			this.saveData("accounts");
 		}
 	}
 }
@@ -230,13 +229,14 @@ MVC.prototype.refreshTab = function() {
 		row.appendChild(colEmail);
 		row.appendChild(colPass);
 		if (i<n) {
+			var history = this.accounts[i].history;
 			for (var j=0; j<history_len; j++) {
 				var colHistory = view.createElement('td');
 				colHistory.id = balanceId(i,j);
 				colHistory.index = i;
 				colHistory.field = "history";
 				colHistory.pos = j;
-				colHistory.innerHTML = "&nbsp &nbsp &nbsp &nbsp";
+				colHistory.innerHTML = (history && history[j]) ? history[j] : "&nbsp &nbsp &nbsp &nbsp";
 				row.appendChild(colHistory);
 			}
 		}
