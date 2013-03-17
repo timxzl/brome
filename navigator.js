@@ -39,14 +39,14 @@ const NaviState = {
 	tasks: true
 };
 
-Navigator.prototype.save = function() {
+Navigator.prototype.save = function(callback) {
 	const item = {};
 	for (key in NaviState) {
 		if (NaviState[key] && this.hasOwnProperty(key)) {
 			item[key] = this[key];
 		}
 	}
-	storage.set({navigator: item});
+	storage.set({navigator: item}, callback);
 }
 
 Navigator.prototype.load = function() {
@@ -101,9 +101,10 @@ Navigator.prototype.init = function() {
 				//alert('pending ' + me.pendingRefresh);
 				if (me.pendingRefresh>0) {
 					me.pendingRefresh--;
-					me.save();
-					chrome.tabs.reload(tabid, {bypassCache: false}, function() {
-						chrome.tabs.executeScript(tabid, rewards_inject);
+					me.save(function() {
+					       	chrome.tabs.reload(tabid, {bypassCache: false}, function() {
+							chrome.tabs.executeScript(tabid, rewards_inject);
+						});
 					});
 				} else {
 					mvc.updateBalance(me.email, req.balance);
@@ -126,16 +127,19 @@ Navigator.prototype.run = function(email, pass) {
 	this.pass = pass;
 	this.pendingRefresh = 1;
 	this.tasks = null;
-	chrome.tabs.create(login_tab_prop, function(tab) {
-		var tabid = tab.id;
-		me.tabid = tabid;
-		me.save();
+	me.save(function() {
+		//alert('here');
+		chrome.tabs.create(login_tab_prop, function(tab) {
+			var tabid = tab.id;
+			me.tabid = tabid;
+			me.save();
+		});
 	});
 }
 
 Navigator.prototype.doTasks = function() {
 	const tasks = this.tasks;
-	alert("doTasks: " + tasks);
+	//alert("doTasks: " + tasks);
 	if (tasks.length > 0) {
 		const task = tasks[tasks.length-1];
 		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord()) : task.link;
@@ -147,7 +151,7 @@ Navigator.prototype.doTasks = function() {
 		const callback = (tasks.length==0) ? null : function() {
 			const delay = randomSec(mvc.gap_low, mvc.gap_high)/60.0;
 			chrome.alarms.create("doTasks", {delayInMinutes:delay});
-			alert("delay " + delay);
+			//alert("delay " + delay);
 		};
 		chrome.tabs.update(this.tabid, {url:link}, callback);
 	}
