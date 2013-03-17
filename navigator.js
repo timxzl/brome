@@ -4,12 +4,12 @@ const account_url = "https://account.live.com";
 const passport_url = "http://www.bing.com/Passport.aspx";
 const rewards_url = "http://www.bing.com/rewards";
 
-const login_tab_prop = {"url": login_url};
-const login_inject = {"file": "login.js", "runAt": "document_idle"};
+const login_tab_prop = {url: login_url};
+const login_inject = {file: "login.js", runAt: "document_idle"};
 
-const account_inject = {"file": "account.js", "runAt": "document_idle"};
-const passport_inject = {"file": "passport.js", "runAt": "document_idle"};
-const rewards_inject = {"file": "rewards.js", "runAt": "document_idle"};
+const account_inject = {file: "account.js", runAt: "document_idle"};
+const passport_inject = {file: "passport.js", runAt: "document_idle"};
+const rewards_inject = {file: "rewards.js", runAt: "document_idle"};
 
 const storage = chrome.storage.local;
 
@@ -66,6 +66,12 @@ Navigator.prototype.init = function() {
 		mvc.setNavi(this);
 	}
 	const me = this;
+	chrome.tabs.onRemoved.addListener(function(tabid, info) {
+		if (tabid == me.tabid) {
+			me.tabid = null;
+			me.save();
+		}
+	});
 	chrome.webNavigation.onCompleted.addListener(function(detail) {
 		const tabid = detail.tabId;
 		const url = detail.url;
@@ -127,13 +133,18 @@ Navigator.prototype.run = function(email, pass) {
 	this.pass = pass;
 	this.pendingRefresh = 1;
 	this.tasks = null;
+	this.tabid = null;
+	callback = function(tab) {
+		var tabid = tab.id;
+		me.tabid = tabid;
+		me.save();
+	};
 	me.save(function() {
 		//alert('here');
-		chrome.tabs.create(login_tab_prop, function(tab) {
-			var tabid = tab.id;
-			me.tabid = tabid;
-			me.save();
-		});
+		//if (me.tabid) {
+			//chrome.tabs.update(me.tabid, login_tab_prop);
+		//}
+		chrome.tabs.create(login_tab_prop, callback);
 	});
 }
 
