@@ -125,7 +125,7 @@ Navigator.prototype.init = function() {
 		});
 		chrome.alarms.onAlarm.addListener(function(alarm) {
 			//alert('alarm ' + alarm.name);
-			if (alarm.name == "doTasks") {
+			if (me.tabid && alarm.name == "doTasks") {
 				me.doTasks();
 			}
 		});
@@ -152,9 +152,8 @@ Navigator.prototype.run = function(email, pass) {
 	});
 }
 
-Navigator.prototype.doTasks = function() {
+Navigator.prototype.doTasks = function() { if (this.tabid) {
 	const tasks = this.tasks;
-	//alert("doTasks: " + tasks);
 	const me = this;
 	if (tasks.length > 0) {
 		const task = tasks[tasks.length-1];
@@ -180,7 +179,7 @@ Navigator.prototype.doTasks = function() {
 		};
 		chrome.tabs.update(me.tabid, {url:link}, callback);
 	}
-}
+}}
 
 // Singleton
 const navi = new Navigator();
