@@ -1,3 +1,4 @@
+const MyID = chrome.i18n.getMessage("@@extension_id");
 const login_domain = "https://login.live.com/"
 const login_url = "https://login.live.com/logout.srf?id=264960&ru=https:%2F%2Flogin.live.com";
 const account_url = "https://account.live.com";
@@ -69,15 +70,16 @@ Navigator.prototype.init = function() {
 		}
 		chrome.tabs.onRemoved.addListener(function(tabid, info) {
 			alert('on remove ' + tabid);
-			if (tabid == me.tabid) {
+			if (me.hasOwnProperty('tabid') && tabid == me.tabid) {
 				me.tabid = null;
 				me.save(null);
 			}
 		});
 		chrome.webNavigation.onCompleted.addListener(function(detail) {
 			const url = detail.url;
-			if (detail.tabid == me.tabid) {
+			if (detail.tabId == me.tabid) {
 				if (url.indexOf(login_domain)==0 && url.length-login_domain.length<10) {
+					//alert('here ' + me.tabid + ' ' + detail.tabId);
 					chrome.tabs.executeScript(me.tabid, login_inject);
 				} else if (url.indexOf(account_url)==0) {
 					chrome.tabs.executeScript(me.tabid, account_inject);
@@ -92,7 +94,7 @@ Navigator.prototype.init = function() {
 		chrome.extension.onMessage.addListener(function(req, sender, respond) {
 			const tab = sender.tab;
 			//alert("req: " + req + " from: " + tab.id + " " + me.tabid + "#" + tab.url + "#" + login_url + "#" + me.email + " " + me.pass + " " + (tab.id==me.tabid) + " " + (tab.url == login_url));
-			if (tab.tabid == me.tabid) {
+			if (sender.id == MyID && tab.id == me.tabid) {
 				if (req=="login") {
 				       	if (tab.url.indexOf(login_domain)==0) {
 						respond({e: me.email, p:me.pass});
