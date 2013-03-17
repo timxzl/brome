@@ -69,7 +69,7 @@ Navigator.prototype.init = function() {
 			mvc.setNavi(me);
 		}
 		chrome.tabs.onRemoved.addListener(function(tabid, info) {
-			alert('on remove ' + tabid);
+			//alert('on remove ' + tabid);
 			if (me.hasOwnProperty('tabid') && tabid == me.tabid) {
 				me.tabid = null;
 				me.save(null);
@@ -115,7 +115,7 @@ Navigator.prototype.init = function() {
 							});
 						});
 					} else {
-						alert('here ' + me.email + ' ' + req.balance);
+						//alert('here ' + me.email + ' ' + req.balance);
 						mvc.updateBalance(me.email, req.balance);
 						me.tasks = req.tasks;
 						me.doTasks();
@@ -155,7 +155,7 @@ Navigator.prototype.run = function(email, pass) {
 Navigator.prototype.doTasks = function() { if (this.tabid) {
 	const tasks = this.tasks;
 	const me = this;
-	if (tasks.length > 0) {
+	if (tasks && tasks.length > 0) {
 		const task = tasks[tasks.length-1];
 		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord()) : task.link;
 		task.amnt--;
@@ -178,6 +178,11 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 			//alert("delay " + delay + " " + link);
 		};
 		chrome.tabs.update(me.tabid, {url:link}, callback);
+	} else {
+		// no tasks to do, close the tab
+		const tabid = me.tabid;
+		me.tabid = null;
+		me.save(function() { chrome.tabs.remove(tabid); });
 	}
 }}
 
