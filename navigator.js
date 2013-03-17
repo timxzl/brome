@@ -23,7 +23,7 @@ function randomWord() {
 }
 
 function randomSec(low, high) {
-	return low + Math.random()*(high-low)*1000/1000.0;
+	return low + Math.random()*(high-low);
 }
 
 function Navigator() {
@@ -49,7 +49,7 @@ Navigator.prototype.save = function(callback) {
 	storage.set({navigator: item}, callback);
 }
 
-Navigator.prototype.load = function() {
+Navigator.prototype.load = function(callback) {
 	storage.get('navigator', function(data) {
 		const nv = data.navigator;
 		for (key in NaviState) {
@@ -57,74 +57,77 @@ Navigator.prototype.load = function() {
 				this[key] = nv[key];
 			}
 		}
+		callback();
 	});
 }
 
 Navigator.prototype.init = function() {
-	this.load();
-	if (mvc) {
-		mvc.setNavi(this);
-	}
 	const me = this;
-	chrome.tabs.onRemoved.addListener(function(tabid, info) {
-		if (tabid == me.tabid) {
-			me.tabid = null;
-			me.save();
+	this.load(function() {
+		if (mvc) {
+			mvc.setNavi(me);
 		}
-	});
-	chrome.webNavigation.onCompleted.addListener(function(detail) {
-		const tabid = detail.tabId;
-		const url = detail.url;
-		if (tabid == me.tabid) {
-			if (url.indexOf(login_domain)==0 && url.length-login_domain.length<10) {
-				chrome.tabs.executeScript(tabid, login_inject);
-			} else if (url.indexOf(account_url)==0) {
-				chrome.tabs.executeScript(tabid, account_inject);
-			} else if (url.indexOf(passport_url)==0) {
-				//alert("redirect:" + tabid + ":" + url);
-				chrome.tabs.executeScript(tabid, passport_inject);
+		chrome.tabs.onRemoved.addListener(function(tabid, info) {
+			if (tabid == me.tabid) {
+				me.tabid = null;
+				me.save();
+			}
+		});
+		chrome.webNavigation.onCompleted.addListener(function(detail) {
+			const tabid = detail.tabId;
+			const url = detail.url;
+			if (tabid == me.tabid) {
+				if (url.indexOf(login_domain)==0 && url.length-login_domain.length<10) {
+					chrome.tabs.executeScript(tabid, login_inject);
+				} else if (url.indexOf(account_url)==0) {
+					chrome.tabs.executeScript(tabid, account_inject);
+				} else if (url.indexOf(passport_url)==0) {
+					//alert("redirect:" + tabid + ":" + url);
+					chrome.tabs.executeScript(tabid, passport_inject);
+				}
 			}
 		}
-	}
-	, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]}
-	);
-	chrome.extension.onMessage.addListener(function(req, sender, respond) {
-		const tab = sender.tab;
-		const tabid = tab.id;
-		//alert("req: " + req + " from: " + tab.id + " " + me.tabid + "#" + tab.url + "#" + login_url + "#" + me.email + " " + me.pass + " " + (tab.id==me.tabid) + " " + (tab.url == login_url));
-		if (tabid == me.tabid) {
-			if (req=="login") {
-			       	if (tab.url.indexOf(login_domain)==0) {
-					respond({e: me.email, p:me.pass});
-				}
-			} else if (req=="passport") {
-				//alert("passport");
-				chrome.tabs.reload(tabid, {bypassCache: false}, function() {
-					//alert("rewards");
-					chrome.tabs.executeScript(tabid, rewards_inject);
-				});
-			} else {
-				//alert('pending ' + me.pendingRefresh);
-				if (me.pendingRefresh>0) {
-					me.pendingRefresh--;
-					me.save(function() {
-					       	chrome.tabs.reload(tabid, {bypassCache: false}, function() {
-							chrome.tabs.executeScript(tabid, rewards_inject);
-						});
+		, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]}
+		);
+		chrome.extension.onMessage.addListener(function(req, sender, respond) {
+			const tab = sender.tab;
+			const tabid = tab.id;
+			//alert("req: " + req + " from: " + tab.id + " " + me.tabid + "#" + tab.url + "#" + login_url + "#" + me.email + " " + me.pass + " " + (tab.id==me.tabid) + " " + (tab.url == login_url));
+			if (tabid == me.tabid) {
+				if (req=="login") {
+				       	if (tab.url.indexOf(login_domain)==0) {
+						respond({e: me.email, p:me.pass});
+					}
+				} else if (req=="passport") {
+					//alert("passport");
+					chrome.tabs.reload(tabid, {bypassCache: false}, function() {
+						//alert("rewards");
+						chrome.tabs.executeScript(tabid, rewards_inject);
 					});
 				} else {
-					alert('here ' + me.email + ' ' + req.balance);
-					mvc.updateBalance(me.email, req.balance);
-					me.tasks = req.tasks;
-					me.doTasks();
+					//alert('pending ' + me.pendingRefresh);
+					if (me.pendingRefresh>0) {
+						me.pendingRefresh--;
+						me.save(function() {
+						       	chrome.tabs.reload(tabid, {bypassCache: false}, function() {
+								chrome.tabs.executeScript(tabid, rewards_inject);
+							});
+						});
+					} else {
+						alert('here ' + me.email + ' ' + req.balance);
+						mvc.updateBalance(me.email, req.balance);
+						me.tasks = req.tasks;
+						me.doTasks();
+					}
 				}
 			}
-		}
-	});
-	chrome.alarms.onAlarm.addListener(function(alarm) {
-		if (alarm.name == "doTasks") {
-			me.doTasks();
-		}
+		});
+		chrome.alarms.onAlarm.addListener(function(alarm) {
+			//alert('alarm ' + alarm.name);
+			if (alarm.name == "doTasks") {
+				me.doTasks();
+			}
+		});
 	});
 }
 
@@ -168,9 +171,9 @@ Navigator.prototype.doTasks = function() {
 				}
 			});
 		} : function() {
-			const delay = randomSec(mvc.gap_low, mvc.gap_high)/60.0;
+			const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))/60.0;
 			chrome.alarms.create("doTasks", {delayInMinutes:delay});
-			//alert("delay " + delay);
+			//alert("delay " + delay + " " + link);
 		};
 		chrome.tabs.update(tabid, {url:link}, callback);
 	}
