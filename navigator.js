@@ -151,6 +151,7 @@ Navigator.prototype.run = function(email, pass) {
 Navigator.prototype.doTasks = function() {
 	const tasks = this.tasks;
 	//alert("doTasks: " + tasks);
+	const tabid = this.tabid;
 	if (tasks.length > 0) {
 		const task = tasks[tasks.length-1];
 		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord()) : task.link;
@@ -159,12 +160,18 @@ Navigator.prototype.doTasks = function() {
 			tasks.pop();
 		}
 		this.save();
-		const callback = (tasks.length==0) ? null : function() {
+		const callback = (tasks.length==0) ? function() {
+			chrome.tabs.update(tabid, {url: rewards_url}, function(tab) {
+				if (tab.id==tabid) {
+					chrome.tabs.executeScript(tabid, rewards_inject);
+				}
+			});
+		} : function() {
 			const delay = randomSec(mvc.gap_low, mvc.gap_high)/60.0;
 			chrome.alarms.create("doTasks", {delayInMinutes:delay});
 			//alert("delay " + delay);
 		};
-		chrome.tabs.update(this.tabid, {url:link}, callback);
+		chrome.tabs.update(tabid, {url:link}, callback);
 	}
 }
 
