@@ -68,22 +68,22 @@ Navigator.prototype.init = function() {
 			mvc.setNavi(me);
 		}
 		chrome.tabs.onRemoved.addListener(function(tabid, info) {
+			alert('on remove ' + tabid);
 			if (tabid == me.tabid) {
 				me.tabid = null;
-				me.save();
+				me.save(null);
 			}
 		});
 		chrome.webNavigation.onCompleted.addListener(function(detail) {
-			const tabid = detail.tabId;
 			const url = detail.url;
-			if (tabid == me.tabid) {
+			if (detail.tabid == me.tabid) {
 				if (url.indexOf(login_domain)==0 && url.length-login_domain.length<10) {
-					chrome.tabs.executeScript(tabid, login_inject);
+					chrome.tabs.executeScript(me.tabid, login_inject);
 				} else if (url.indexOf(account_url)==0) {
-					chrome.tabs.executeScript(tabid, account_inject);
+					chrome.tabs.executeScript(me.tabid, account_inject);
 				} else if (url.indexOf(passport_url)==0) {
 					//alert("redirect:" + tabid + ":" + url);
-					chrome.tabs.executeScript(tabid, passport_inject);
+					chrome.tabs.executeScript(me.tabid, passport_inject);
 				}
 			}
 		}
@@ -91,26 +91,25 @@ Navigator.prototype.init = function() {
 		);
 		chrome.extension.onMessage.addListener(function(req, sender, respond) {
 			const tab = sender.tab;
-			const tabid = tab.id;
 			//alert("req: " + req + " from: " + tab.id + " " + me.tabid + "#" + tab.url + "#" + login_url + "#" + me.email + " " + me.pass + " " + (tab.id==me.tabid) + " " + (tab.url == login_url));
-			if (tabid == me.tabid) {
+			if (tab.tabid == me.tabid) {
 				if (req=="login") {
 				       	if (tab.url.indexOf(login_domain)==0) {
 						respond({e: me.email, p:me.pass});
 					}
 				} else if (req=="passport") {
 					//alert("passport");
-					chrome.tabs.reload(tabid, {bypassCache: false}, function() {
+					chrome.tabs.reload(me.tabid, {bypassCache: false}, function() {
 						//alert("rewards");
-						chrome.tabs.executeScript(tabid, rewards_inject);
+						chrome.tabs.executeScript(me.tabid, rewards_inject);
 					});
 				} else {
 					//alert('pending ' + me.pendingRefresh);
 					if (me.pendingRefresh>0) {
 						me.pendingRefresh--;
 						me.save(function() {
-						       	chrome.tabs.reload(tabid, {bypassCache: false}, function() {
-								chrome.tabs.executeScript(tabid, rewards_inject);
+						       	chrome.tabs.reload(me.tabid, {bypassCache: false}, function() {
+								chrome.tabs.executeScript(me.tabid, rewards_inject);
 							});
 						});
 					} else {
@@ -139,9 +138,8 @@ Navigator.prototype.run = function(email, pass) {
 	this.tasks = null;
 	this.tabid = null;
 	callback = function(tab) {
-		var tabid = tab.id;
-		me.tabid = tabid;
-		me.save();
+		me.tabid = tab.id;
+		me.save(null);
 	};
 	me.save(function() {
 		//alert('here');
@@ -155,7 +153,7 @@ Navigator.prototype.run = function(email, pass) {
 Navigator.prototype.doTasks = function() {
 	const tasks = this.tasks;
 	//alert("doTasks: " + tasks);
-	const tabid = this.tabid;
+	const me = this;
 	if (tasks.length > 0) {
 		const task = tasks[tasks.length-1];
 		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord()) : task.link;
@@ -163,11 +161,11 @@ Navigator.prototype.doTasks = function() {
 		if (task.amnt <= 0) {
 			tasks.pop();
 		}
-		this.save();
+		this.save(null);
 		const callback = (tasks.length==0) ? function() {
-			chrome.tabs.update(tabid, {url: rewards_url}, function(tab) {
-				if (tab.id==tabid) {
-					chrome.tabs.executeScript(tabid, rewards_inject);
+			chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) {
+				if (tab.id==me.tabid) {
+					chrome.tabs.executeScript(me.tabid, rewards_inject);
 				}
 			});
 		} : function() {
@@ -175,7 +173,7 @@ Navigator.prototype.doTasks = function() {
 			chrome.alarms.create("doTasks", {delayInMinutes:delay});
 			//alert("delay " + delay + " " + link);
 		};
-		chrome.tabs.update(tabid, {url:link}, callback);
+		chrome.tabs.update(me.tabid, {url:link}, callback);
 	}
 }
 
