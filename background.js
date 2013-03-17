@@ -1,5 +1,15 @@
 const storage = chrome.storage.local;
 
+function findEmail(accounts, email) {
+	for (var i=0; i<accounts.length; i++) {
+		if (accounts[i].email == email) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+
 function clearTab(tab) {
 	const m = tab.rows.length;
 	for (var i=m-1; i>=0; i--) {
@@ -54,6 +64,13 @@ MVC.prototype.run = function(i) {
 	this.refreshTab();
 }
 
+MVC.prototype.completeRun = function(email) {
+	this.running = false;
+	if (this.accounts[this.cur].email == email) {
+		this.view.getElementById('button' + this.cur).value = '*';
+	}
+}
+
 MVC.prototype.saveData = function(key) {
 	const item = {};
 	item[key] = this[key];
@@ -87,13 +104,7 @@ MVC.prototype.clearHistory = function(index) {
 
 MVC.prototype.updateBalance = function(email, balance) {
 	const accounts = this.accounts;
-	var index = -1;
-	for (var i=0; i<accounts.length; i++) {
-		if (accounts[i].email == email) {
-			index = i;
-			break;
-		}
-	}
+	const index = findEmail(accounts, email);
 	if (index >= 0) {
 		history = accounts[index].history;
 		if (!history) {

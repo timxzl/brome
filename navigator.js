@@ -182,7 +182,10 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		// no tasks to do, close the tab
 		const tabid = me.tabid;
 		me.tabid = null;
-		me.save(function() { chrome.tabs.remove(tabid); });
+		me.save(function() {
+			chrome.tabs.remove(tabid);
+			mvc.completeRun(me.email);
+		});
 	}
 }}
 

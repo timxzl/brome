@@ -55,8 +55,8 @@ function main() {
 				}
 			}
 		}
-		console.log(task);
-	       	console.log(task[0] + " " + task.length);
+		//console.log(task);
+	       	//console.log(task[0] + " " + task.length);
 		chrome.extension.sendMessage({balance: bal, tasks: task});
 	}
 }
