@@ -113,6 +113,7 @@ Navigator.prototype.init = function() {
 						});
 					});
 				} else {
+					alert('here ' + me.email + ' ' + req.balance);
 					mvc.updateBalance(me.email, req.balance);
 					me.tasks = req.tasks;
 					me.doTasks();
