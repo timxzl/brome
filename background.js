@@ -101,20 +101,20 @@ MVC.prototype.updateBalance = function(email, balance) {
 			accounts[index].history = history;
 		}
 		if (history.length==0 || balance != history[0]) {
-			if (history.length>0 && balance > history[0] && balance < history[0]+5) {
-				history[0] = balance;
-				const view = this.view;
-				if (view) {
-					const td = view.getElementById(balanceId(index, 0));
-					if (td) {
-						td.innerHTML = balance;
+			if (history.length >= history_len) {
+				history.splice(history_len, history.length-history_len);
+				var to_del = history_len-1;
+				for (var j=to_del; j>0; j--) {
+					if (history[j]<history[j-1] && history[j-1]-history[j]<=5) {
+						to_del = j;
+						break;
 					}
 				}
-			} else {
-				// insert into 0
-				history.splice(0,0,balance);
-				this.updateHistory(index);
+				history.splice(to_del, 1);
 			}
+			// insert into 0
+			history.splice(0,0,balance);
+			this.updateHistory(index);
 			this.saveData("accounts");
 		}
 	}
