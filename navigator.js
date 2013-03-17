@@ -73,6 +73,7 @@ Navigator.prototype.init = function() {
 			if (me.hasOwnProperty('tabid') && tabid == me.tabid) {
 				me.tabid = null;
 				me.save(null);
+				mvc.completeRun(me.email);
 			}
 		});
 		chrome.webNavigation.onCompleted.addListener(function(detail) {
@@ -166,7 +167,7 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		const callback = (tasks.length==0) ? function() {
 			chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) {
 				if (tab.id==me.tabid) {
-					me.pendingRefresh = 1;
+					me.pendingRefresh = 2;
 					me.save(function() {
 						chrome.tabs.executeScript(me.tabid, rewards_inject);
 					});

@@ -34,7 +34,6 @@ function MVC() {
 // accounts: [{email, pass, [balance], checked}]
 	this.cur = 0;
 	this.running = false;
-	this.iters = 33;
 	this.wait_low = 3;
 	this.wait_high = 7;
 	this.gap_low = 1;
@@ -60,6 +59,7 @@ MVC.prototype.run = function(i) {
 	const account = this.accounts[i];
 	this.cur = i;
 	this.running = true;
+	this.saveData('cur');
 	this.navi.run(account.email, account.pass);
 	this.refreshTab();
 }
@@ -67,7 +67,7 @@ MVC.prototype.run = function(i) {
 MVC.prototype.completeRun = function(email) {
 	this.running = false;
 	if (this.accounts[this.cur].email == email) {
-		this.view.getElementById('button' + this.cur).value = '*';
+		this.view.getElementById('run' + this.cur).value = '*';
 	}
 }
 
@@ -220,19 +220,24 @@ MVC.prototype.refreshTab = function() {
 			me.applyChange(this);
 		}
 		passbox.ondblclick = setReadOnly(false);
+		var btn = view.createElement('input');
+		btn.type = 'button';
 		if (i<n) {
 			emailbox.onblur = setReadOnly(true);
 			passbox.onblur = setReadOnly(true);
-			var btn = view.createElement('input');
-			btn.type = 'button';
-			btn.id = 'button' + i;
+			btn.id = 'run' + i;
 			btn.index = i;
 			btn.value = (i==this.cur) ? (this.running ? '$' : '*') : ' ';
 			btn.onclick = function() {
 				me.run(this.index);
 			}
-			colBtn.appendChild(btn);
+		} else {
+			btn.id = 'runall';
+			btn.value = '\u2200'; //forall symbol
+			btn.onclick = me.runall();
 		}
+		colBtn.appendChild(btn);
+
 
 		colEmail.appendChild(emailbox);
 		colPass.appendChild(passbox);
