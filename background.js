@@ -313,10 +313,6 @@ MVC.prototype.refreshControl = function() {
 			me.saveData(key);
 		}
 	}
-	const runbtn = view.getElementById('run');
-	runbtn.onclick = function() {
-		me.refreshTab();
-	}
 }
 
 MVC.prototype.refreshView = function() {
