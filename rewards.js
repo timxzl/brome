@@ -48,7 +48,11 @@ function main() {
 		for (var i=0; i<tiles.length; i++) {
 			var info = analyzeTile(tiles[i]);
 			if (info) {
-				task.push(info);
+				if (info.link == "search") {
+					task.splice(0,0,info);
+				} else {
+					task.push(info);
+				}
 			}
 		}
 		chrome.extension.sendMessage({balance: bal, tasks: task});
