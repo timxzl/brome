@@ -167,7 +167,10 @@ Navigator.prototype.doTasks = function() {
 		const callback = (tasks.length==0) ? function() {
 			chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) {
 				if (tab.id==me.tabid) {
-					chrome.tabs.executeScript(me.tabid, rewards_inject);
+					me.pendingRefresh = 1;
+					me.save(function() {
+						chrome.tabs.executeScript(me.tabid, rewards_inject);
+					});
 				}
 			});
 		} : function() {
