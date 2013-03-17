@@ -20,11 +20,11 @@ function analyzeTile(tile) {
 	if (!progress) {
 		return null;
 	}
-	console.log(progress);
+	//console.log(progress);
 	var times = parseInt(progress[2]) - parseInt(progress[1]);
 	var lnk;
 	if (title == "Search Bing") {
-		lnk = "Search";
+		lnk = "search";
 		per = PerSearchRE.exec(tile.children[1].children[1].innerText);
 		if (per) {
 			times *= parseInt(per[1]);
@@ -34,7 +34,7 @@ function analyzeTile(tile) {
 	} else {
 		lnk = tile.href;
 	}
-	console.log(lnk + " " + times);
+	//console.log(lnk + " " + times);
 	return {link: lnk, amnt: times};
 }
 

@@ -13,6 +13,15 @@ const rewards_inject = {"file": "rewards.js", "runAt": "document_idle"};
 
 const storage = chrome.storage.local;
 
+const CharCodeA = 'a'.charCodeAt();
+function randomWord() {
+	var s = '';
+	for (var len = 3+Math.floor(Math.random()*10); len>0; len--) {
+		s += String.fromCharCode(CharCodeA+Math.floor(Math.random()*26));
+	}
+	return s;
+}
+
 function Navigator() {
 	// tabid: int
 	// email, pass: string
@@ -82,6 +91,8 @@ Navigator.prototype.init = function() {
 					});
 				} else {
 					mvc.updateBalance(me.email, req.balance);
+					me.tasks = req.tasks;
+					me.doTasks();
 				}
 			}
 		}
@@ -93,10 +104,28 @@ Navigator.prototype.run = function(email, pass) {
 	this.email = email;
 	this.pass = pass;
 	this.pendingRefresh = 1;
+	this.tasks = null;
 	chrome.tabs.create(login_tab_prop, function(tab) {
 		var tabid = tab.id;
 		me.tabid = tabid;
 	});
+}
+
+Navigator.prototype.doTasks = function() {
+	const tasks = this.tasks;
+	if (tasks.length > 0) {
+		const task = tasks[tasks.length-1];
+		const link = (task.link == "search") ? "http://www.bing.com/search?q=" + randomWord() : task.link;
+		task.amnt--;
+		if (task.amnt == 0) {
+			tasks.pop();
+		}
+		const callback = (tasks.length==0) ? null : function() {
+			const delay = /60.0;
+			chrome.alarms.create("doTask", {delayInMinutes:delay});
+		};
+		chrome.tabs.update(me.tabid, {url:link}, callback);
+	}
 }
 
 
