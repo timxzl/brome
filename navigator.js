@@ -100,6 +100,11 @@ Navigator.prototype.init = function() {
 			}
 		}
 	});
+	chrome.alarms.onAlarm.addListener(function(alarm) {
+		if (alarm.name == "doTasks") {
+			me.doTasks();
+		}
+	});
 }
 
 Navigator.prototype.run = function(email, pass) {
@@ -125,8 +130,8 @@ Navigator.prototype.doTasks = function() {
 		}
 		const callback = (tasks.length==0) ? null : function() {
 			const delay = randomSec(mvc.gap_low, mvc.gap_high)/60.0;
-			alert("delay " + delay);
-			chrome.alarms.create("doTask", {delayInMinutes:delay});
+			chrome.alarms.create("doTasks", {delayInMinutes:delay});
+			//alert("delay " + delay);
 		};
 		chrome.tabs.update(this.tabid, {url:link}, callback);
 	}
