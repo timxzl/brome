@@ -22,6 +22,10 @@ function randomWord() {
 	return s;
 }
 
+function randomSec(low, high) {
+	return low + Math.random()*(high-low)*1000/1000.0;
+}
+
 function Navigator() {
 	// tabid: int
 	// email, pass: string
@@ -82,7 +86,6 @@ Navigator.prototype.init = function() {
 					chrome.tabs.executeScript(tabid, rewards_inject);
 				});
 			} else {
-				//console.log('call updateBalance(' + me.email + ',' + req.balance);
 				//alert('pending ' + me.pendingRefresh);
 				if (me.pendingRefresh>0) {
 					me.pendingRefresh--;
@@ -115,16 +118,17 @@ Navigator.prototype.doTasks = function() {
 	const tasks = this.tasks;
 	if (tasks.length > 0) {
 		const task = tasks[tasks.length-1];
-		const link = (task.link == "search") ? "http://www.bing.com/search?q=" + randomWord() : task.link;
+		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord()) : task.link;
 		task.amnt--;
-		if (task.amnt == 0) {
+		if (task.amnt <= 0) {
 			tasks.pop();
 		}
 		const callback = (tasks.length==0) ? null : function() {
-			const delay = /60.0;
+			const delay = randomSec(mvc.gap_low, mvc.gap_high)/60.0;
+			alert("delay " + delay);
 			chrome.alarms.create("doTask", {delayInMinutes:delay});
 		};
-		chrome.tabs.update(me.tabid, {url:link}, callback);
+		chrome.tabs.update(this.tabid, {url:link}, callback);
 	}
 }
 
