@@ -31,6 +31,16 @@ function MVC() {
 	this.gap_high = 5;
 	this.accounts = [];
 }
+const MVCState = {
+	cur: true,
+	running: true,
+       	iters: true,
+	wait_low: true,
+	wait_high: true,
+	gap_low: true,
+	gap_high: true,
+	accounts: true
+};
 
 MVC.prototype.setNavi = function(nv) {
 	this.navi = nv;
@@ -308,8 +318,10 @@ MVC.prototype.setView = function(view) {
 MVC.prototype.loadData = function() {
 	const me = this;
 	storage.get(null, function(data) {
-		for (key in data) {
-			me[key] = data[key];
+		for (key in MVCState) {
+			if (MVCState[key] && data.hasOwnProperty(key)) {
+				me[key] = data[key];
+			}
 		}
 		if (!me.accounts) {
 			me.accounts = [];
