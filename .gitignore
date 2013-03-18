@@ -1,0 +1,6 @@
+# vim backup and temp
+*~
+*.swp
+
+# OS X garbage
+.DS_STORE
