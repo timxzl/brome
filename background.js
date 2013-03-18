@@ -103,6 +103,9 @@ MVC.prototype.completeRun = function(email, finished) {
 					const delay = randomSec(parseFloat(this.wait_low), parseFloat(this.wait_high))/60.0;
 					chrome.alarms.create("doAll", {delayInMinutes:delay});
 				}
+				else {
+					this.running = false;
+				}
 			} else{
 				this.running = false;
 			}
