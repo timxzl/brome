@@ -100,7 +100,7 @@ MVC.prototype.completeRun = function(email, finished) {
 			if (this.running == 'all') {
 				this.cur = findNextChecked(accounts, cur);
 				if (this.cur >= 0) {
-					const delay = randomSec(parseFloat(this.wait_low), parseFloat(this.this_high))/60.0;
+					const delay = randomSec(parseFloat(this.wait_low), parseFloat(this.wait_high))/60.0;
 					chrome.alarms.create("doAll", {delayInMinutes:delay});
 				}
 			} else{
@@ -403,15 +403,16 @@ MVC.prototype.setView = function(view) {
 
 MVC.prototype.init = function() {
 	this.load();
-	if (navi) {
-		this.setNavi(navi);
-	}
 	const me = this;
 	chrome.alarms.onAlarm.addListener(function(alarm) {
 		if (alarm.name == 'doAll' && me.running == 'all') {
 			me.run(me.cur);
 		}
 	});
+	// this will fail if navi is not present (usually it's not because this runs before Navigator.js, so we should put this always at the end
+	if (navi) {
+		this.setNavi(navi);
+	}
 }
 
 // Singleton

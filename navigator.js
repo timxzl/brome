@@ -5,7 +5,7 @@ const account_url = "https://account.live.com";
 const passport_url = "http://www.bing.com/Passport.aspx";
 const rewards_url = "http://www.bing.com/rewards";
 
-const login_tab_prop = {url: login_url};
+const login_tab_prop = {url: login_url, active:false};
 const login_inject = {file: "login.js", runAt: "document_idle"};
 
 const account_inject = {file: "account.js", runAt: "document_idle"};
