@@ -51,11 +51,13 @@ Navigator.prototype.save = function(callback) {
 }
 
 Navigator.prototype.load = function(callback) {
+	const me = this;
 	storage.get('navigator', function(data) {
 		const nv = data.navigator;
+		//alert(nv);
 		for (key in NaviState) {
 			if (NaviState[key] && nv.hasOwnProperty(key)) {
-				this[key] = nv[key];
+				me[key] = nv[key];
 			}
 		}
 		callback();
