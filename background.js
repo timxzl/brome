@@ -302,7 +302,7 @@ MVC.prototype.refreshTab = function() {
 			passbox.onblur = setReadOnly(true);
 			btn.id = 'run' + i;
 			btn.index = i;
-			btn.value = (i==this.cur) ? (this.running ? '$' : '*') : ' ';
+			btn.value = (i==this.cur) ? (this.running ? '$' : '*') : (i+1);
 			btn.onclick = function() {
 				me.run(this.index);
 			}
