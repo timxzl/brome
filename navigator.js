@@ -90,7 +90,10 @@ Navigator.prototype.init = function() {
 			if (detail.tabId == me.tabid) {
 				if (url.indexOf(login_domain)==0 && url.length-login_domain.length<10) {
 					//alert('here ' + me.tabid + ' ' + detail.tabId);
-					chrome.tabs.executeScript(me.tabid, login_inject);
+					const delay = randomSec(parseFloat(mvc.wait_low), parseFloat(mvc.wait_high))/60.0;
+					chrome.alarms.create("doLogin", {delayInMinutes:delay});
+					//alert('delay ' + delay);
+					//chrome.tabs.executeScript(me.tabid, login_inject);
 				} else if (url.indexOf(account_url)==0) {
 					chrome.tabs.executeScript(me.tabid, account_inject);
 				} else if (url.indexOf(passport_url)==0) {
@@ -134,9 +137,12 @@ Navigator.prototype.init = function() {
 			}
 		});
 		chrome.alarms.onAlarm.addListener(function(alarm) {
-			//alert('alarm ' + alarm.name);
-			if (me.tabid && alarm.name == "doTasks") {
-				me.doTasks();
+			if (me.tabid) {
+				if (alarm.name == "doLogin") {
+					chrome.tabs.executeScript(me.tabid, login_inject);
+				} else if (alarm.name == "doTasks") {
+					me.doTasks();
+				}
 			}
 		});
 	});
@@ -146,7 +152,7 @@ Navigator.prototype.run = function(email, pass) {
 	const me = this;
 	this.email = email;
 	this.pass = pass;
-	this.pendingRefresh = 1;
+	this.pendingRefresh = 2;
 	this.tasks = null;
 	this.tabid = null;
 	callback = function(tab) {
@@ -176,7 +182,7 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		const callback = (tasks.length==0) ? function() {
 			chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) {
 				if (tab.id==me.tabid) {
-					me.pendingRefresh = 2;
+					me.pendingRefresh = 3 + floor(Math.random()*5);
 					me.save(function() {
 						chrome.tabs.executeScript(me.tabid, rewards_inject);
 					});
