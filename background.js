@@ -9,6 +9,21 @@ function findEmail(accounts, email) {
 	return -1;
 }
 
+function findNextChecked(accounts, i) {
+	const end = accounts.length-1;
+	var j = (i>=0 && i<=end) ? i : 0;
+	do {
+		if (accounts[j].checked) {
+			return j;
+		}
+		if (j == end) {
+			j = 0;
+		} else {
+			j++;
+		}
+	} while(j != i);
+	return -1;
+}
 
 function clearTab(tab) {
 	const m = tab.rows.length;
@@ -64,15 +79,23 @@ MVC.prototype.run = function(i) {
 	this.refreshTab();
 }
 
+<<<<<<< HEAD
 MVC.prototype.runall = function() {
 	this.navi.stop();
 }
 
-MVC.prototype.completeRun = function(email) {
+MVC.prototype.completeRun = function(email, finished) {
 	this.running = false;
 	if (this.accounts[this.cur].email == email) {
 		this.view.getElementById('run' + this.cur).value = '*';
 	}
+	if (finished) {
+	}
+}
+
+MVC.prototype.runall = function() {
+	const accounts = this.accounts;
+	this.cur = findNextChecked(accounts, this.cur);
 }
 
 MVC.prototype.saveData = function(key) {
