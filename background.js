@@ -64,6 +64,10 @@ MVC.prototype.run = function(i) {
 	this.refreshTab();
 }
 
+MVC.prototype.runall = function() {
+	this.navi.stop();
+}
+
 MVC.prototype.completeRun = function(email) {
 	this.running = false;
 	if (this.accounts[this.cur].email == email) {

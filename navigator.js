@@ -62,6 +62,15 @@ Navigator.prototype.load = function(callback) {
 	});
 }
 
+Navigator.prototype.stop = function() {
+	if (me.hasOwnProperty('tabid') && me.tabid != null) {
+		const tabid = me.tabid;
+		me.tabid = null;
+		me.save(null);
+		chrome.tabs.remove(tabid);
+	}
+}
+
 Navigator.prototype.init = function() {
 	const me = this;
 	this.load(function() {
