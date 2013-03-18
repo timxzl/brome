@@ -79,7 +79,6 @@ MVC.prototype.run = function(i) {
 	this.refreshTab();
 }
 
-<<<<<<< HEAD
 MVC.prototype.runall = function() {
 	this.navi.stop();
 }
