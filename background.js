@@ -306,7 +306,9 @@ MVC.prototype.refreshTab = function() {
 		} else {
 			btn.id = 'runall';
 			btn.value = "\u2200"; //forall symbol
-			btn.onclick = me.runall;
+			btn.onclick = function() {
+				me.runall();
+			}
 		}
 		colBtn.appendChild(btn);
 

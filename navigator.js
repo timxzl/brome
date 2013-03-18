@@ -63,10 +63,10 @@ Navigator.prototype.load = function(callback) {
 }
 
 Navigator.prototype.stop = function() {
-	if (me.hasOwnProperty('tabid') && me.tabid != null) {
-		const tabid = me.tabid;
-		me.tabid = null;
-		me.save(null);
+	if (this.hasOwnProperty('tabid') && this.tabid != null) {
+		const tabid = this.tabid;
+		this.tabid = null;
+		this.save(null);
 		chrome.tabs.remove(tabid);
 	}
 }
