@@ -73,7 +73,7 @@ MVC.prototype.setNavi = function(nv) {
 MVC.prototype.run = function(i) {
 	const account = this.accounts[i];
 	this.cur = i;
-	this.running = true;
+	if (!this.running) { this.running = true; }
 	this.saveData('cur');
 	this.navi.run(account.email, account.pass);
 	this.refreshTab();
@@ -81,20 +81,37 @@ MVC.prototype.run = function(i) {
 
 MVC.prototype.runall = function() {
 	this.navi.stop();
+	const accounts = this.accounts;
+	this.cur = findNextChecked(accounts, this.cur);
+	if (this.cur >= 0) {
+		this.running = 'all';
+		this.save();
+		this.run(this.cur);
+	}
 }
 
 MVC.prototype.completeRun = function(email, finished) {
-	this.running = false;
-	if (this.accounts[this.cur].email == email) {
-		this.view.getElementById('run' + this.cur).value = '*';
-	}
-	if (finished) {
-	}
-}
-
-MVC.prototype.runall = function() {
 	const accounts = this.accounts;
-	this.cur = findNextChecked(accounts, this.cur);
+	const cur = this.cur;
+	if (accounts[cur].email == email) {
+		//this.view.getElementById('run' + this.cur).value = '*';
+		if (finished) {
+			accounts[cur].checked = false;
+			if (this.running == 'all') {
+				this.cur = findNextChecked(accounts, cur);
+				if (this.cur >= 0) {
+					const delay = randomSec(parseFloat(this.wait_low), parseFloat(this.this_high))/60.0;
+					chrome.alarms.create("doAll", {delayInMinutes:delay});
+				}
+			} else{
+				this.running = false;
+			}
+		} else {
+			this.running = false;
+		}
+		this.save();
+		this.refreshTab();
+	}
 }
 
 MVC.prototype.saveData = function(key) {
@@ -102,6 +119,35 @@ MVC.prototype.saveData = function(key) {
 	item[key] = this[key];
 	storage.set(item);
 }
+
+MVC.prototype.save = function() {
+	const item = {};
+	for (key in MVCState) {
+		if (MVCState[key] && this.hasOwnProperty(key)) {
+			item[key] = this[key];
+		}
+	}
+	storage.set(item);
+}
+
+MVC.prototype.load = function() {
+	const me = this;
+	storage.get(null, function(data) {
+		for (key in MVCState) {
+			if (MVCState[key] && data.hasOwnProperty(key)) {
+				me[key] = data[key];
+			}
+		}
+		if (!me.accounts) {
+			me.accounts = [];
+		}
+		if (me.view) {
+			me.refreshView();
+		}
+	});
+}
+
+
 
 MVC.prototype.updateHistory = function(index) {
 	const view = this.view;
@@ -353,27 +399,19 @@ MVC.prototype.setView = function(view) {
 	}
 }
 
-MVC.prototype.loadData = function() {
+MVC.prototype.init = function() {
+	this.load();
+	if (navi) {
+		this.setNavi(navi);
+	}
 	const me = this;
-	storage.get(null, function(data) {
-		for (key in MVCState) {
-			if (MVCState[key] && data.hasOwnProperty(key)) {
-				me[key] = data[key];
-			}
-		}
-		if (!me.accounts) {
-			me.accounts = [];
-		}
-		if (me.view) {
-			me.refreshView();
+	chrome.alarms.onAlarm.addListener(function(alarm) {
+		if (alarm.name == 'doAll' && me.running == 'all') {
+			me.run(me.cur);
 		}
 	});
 }
 
 // Singleton
 const mvc = new MVC();
-mvc.loadData();
-if (navi) {
-	mvc.setNavi(navi);
-}
-
+mvc.init();

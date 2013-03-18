@@ -82,7 +82,7 @@ Navigator.prototype.init = function() {
 			if (me.hasOwnProperty('tabid') && tabid == me.tabid) {
 				me.tabid = null;
 				me.save(null);
-				mvc.completeRun(me.email);
+				mvc.completeRun(me.email, false);
 			}
 		});
 		chrome.webNavigation.onCompleted.addListener(function(detail) {
@@ -194,7 +194,7 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		me.tabid = null;
 		me.save(function() {
 			chrome.tabs.remove(tabid);
-			mvc.completeRun(me.email);
+			mvc.completeRun(me.email, true);
 		});
 	}
 }}
