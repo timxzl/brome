@@ -27,9 +27,9 @@ function scrape() {
 			var words = p[0].innerText.toLowerCase().match(WordRE);
 			for (var j=0; j<words.length && j<100; j++) {
 				var w = words[j];
-				if (w.length<7) {
-					alert(w);
-				}
+				//if (w.length<7) {
+				//	alert(w);
+				//}
 				if (dict.hasOwnProperty(w)) {
 					continue;
 				}
