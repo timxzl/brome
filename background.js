@@ -88,7 +88,7 @@ MVC.prototype.runall = function() {
 	if (this.cur >= 0) {
 		this.running = 'all';
 		const me = this;
-		chrome.windows.getCurrent(null, function(win) {
+		chrome.windows.getLastFocused(null, function(win) {
 			me.windowId = win.id;
 			me.save();
 			me.run(me.cur);
