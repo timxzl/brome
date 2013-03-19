@@ -167,6 +167,7 @@ Navigator.prototype.run = function(email, pass) {
 		//if (me.tabid) {
 			//chrome.tabs.update(me.tabid, login_tab_prop);
 		//}
+		//alert(mvc.windowId);
 		chrome.tabs.create(login_tab_prop, callback);
 	});
 }
@@ -181,11 +182,11 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		if (task.amnt <= 0) {
 			tasks.pop();
 		}
-		this.save(null);
+		this.save();
 		const callback = (tasks.length==0) ? function() {
 			chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) {
 				if (tab.id==me.tabid) {
-					me.pendingRefresh = 3 + Math.floor(Math.random()*5);
+					me.pendingRefresh = 3;
 					me.save(function() {
 						chrome.tabs.executeScript(me.tabid, rewards_inject);
 					});
@@ -193,7 +194,9 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 			});
 		} : function() {
 			const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))/60.0;
-			chrome.alarms.create("doTasks", {delayInMinutes:delay});
+			me.save(function() {
+				chrome.alarms.create("doTasks", {delayInMinutes:delay});
+			});
 			//alert("delay " + delay + " " + link);
 		};
 		chrome.tabs.update(me.tabid, {url:link}, callback);

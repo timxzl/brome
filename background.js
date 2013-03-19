@@ -311,6 +311,8 @@ MVC.prototype.refreshTab = function() {
 			btn.index = i;
 			btn.value = (i==this.cur) ? (this.running ? '$' : '*') : (i+1);
 			btn.onclick = function() {
+				me.windowId = null;
+				me.saveData("windowId");
 				me.run(this.index);
 			}
 		} else {
