@@ -64,7 +64,7 @@ Navigator.prototype.updateKeywords = function(words) {
 	keywords.sort();
 	unique(keywords);
 	if (keywords.length > MaxKeywords) {
-		keywords.splice(0, MaxKeywords-keywords.length);
+		keywords.splice(0, keywords.length-MaxKeywords);
 	}
 	this.save();
 }
