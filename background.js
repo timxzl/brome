@@ -49,6 +49,7 @@ function MVC() {
 // accounts: [{email, pass, [balance], checked}]
 	this.cur = 0;
 	this.running = false;
+	this.windowId = null;
 	this.wait_low = 3;
 	this.wait_high = 7;
 	this.gap_low = 1;
@@ -58,6 +59,7 @@ function MVC() {
 const MVCState = {
 	cur: true,
 	running: true,
+	windowId: true,
        	iters: true,
 	wait_low: true,
 	wait_high: true,
@@ -85,8 +87,12 @@ MVC.prototype.runall = function() {
 	this.cur = findNextChecked(accounts, this.cur);
 	if (this.cur >= 0) {
 		this.running = 'all';
-		this.save();
-		this.run(this.cur);
+		const me = this;
+		chrome.windows.getCurrent(null, function(win) {
+			me.windowId = win.id;
+			me.save();
+			me.run(me.cur);
+		});
 	}
 }
 
@@ -105,6 +111,7 @@ MVC.prototype.completeRun = function(email, finished) {
 				}
 				else {
 					this.running = false;
+					this.windowId = null;
 				}
 			} else{
 				this.running = false;
