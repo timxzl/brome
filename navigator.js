@@ -45,9 +45,10 @@ const NaviState = {
 };
 
 Navigator.prototype.updateKeywords = function(words) {
-	keywords.push.apply(this.keywords, words);
+	const keywords = this.keywords;
+	keywords.push.apply(keywords, words);
 	if (keywords.length > MaxKeywords) {
-		keywords.splice(0, MaxKeywords-this.keywords.length);
+		keywords.splice(0, MaxKeywords-keywords.length);
 	}
 	this.save();
 }
