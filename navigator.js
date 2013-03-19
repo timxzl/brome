@@ -17,6 +17,20 @@ const MaxKeywords = 100;
 
 const storage = chrome.storage.local;
 
+function unique(a) {
+	// a is already sorted
+	var j = 0;
+	for (var i=1; i<a.length; i++) {
+		if (a[i].indexOf(a[j])<0) {
+			j++;
+			if (i != j) {
+				a[j] = a[i];
+			}
+		}
+	}
+	a.splice(j, a.length-j);
+}
+
 const CharCodeA = 'a'.charCodeAt();
 function randomWord(words) {
 	var i = Math.floor(Math.random()*words.length);
@@ -47,6 +61,8 @@ const NaviState = {
 Navigator.prototype.updateKeywords = function(words) {
 	const keywords = this.keywords;
 	keywords.push.apply(keywords, words);
+	keywords.sort();
+	unique(keywords);
 	if (keywords.length > MaxKeywords) {
 		keywords.splice(0, MaxKeywords-keywords.length);
 	}
@@ -74,7 +90,7 @@ Navigator.prototype.load = function(callback) {
 			}
 		}
 		if (!me.keywords || me.keywords.length<3) {
-			me.keywords = ['news', 'weather', 'sports', 'science', 'IT', 'technology', 'programming', 'language', 'open ssl', 'android', 'iphone', 'google'];
+			me.keywords = ['news', 'weather', 'sports', 'science', 'technology', 'programming', 'language', 'openssl', 'android', 'iphone', 'google'];
 		}
 		callback();
 	});
