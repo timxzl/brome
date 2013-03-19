@@ -1,5 +1,3 @@
-var done = false;
-
 const WordRE = /[a-z]+/gi;
 
 const MaxWords = 20;
@@ -10,22 +8,26 @@ function scrape() {
 	for (var i=0; i<pars.length && i<10; i++) {
 		var p = pars[i].getElementsByTagName('p');
 		if (p && p.length>0) {
-			var words = p.innerText.match(WordRE);
-			for (int j=0; j<words.length && j<100; j++) {
+			var words = p[0].innerText.match(WordRE);
+			for (var j=0; j<words.length && j<100; j++) {
 				var w = words[j];
 				if (result.length<MaxWords) {
 					result.push(w);
 				} else {
 					if (Math.random()>0.9) {
-						var i = Math.floor(Math.random()*(MaxWords-1));
-						result[i] = w;
+						var k = Math.floor(Math.random()*(MaxWords-1));
+						result[k] = w;
 					}
 				}
 			}
 		}
 	}
+	return result;
 }
 
 const r = scrape();
-console.log(r);
-chrome.extension.sendMessage(r);
+//console.log(r);
+if (r.length>0) {
+	chrome.extension.sendMessage(r);
+}
+

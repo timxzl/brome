@@ -5,22 +5,25 @@ const account_url = "https://account.live.com";
 const passport_url = "http://www.bing.com/Passport.aspx";
 const rewards_url = "http://www.bing.com/rewards";
 
-var login_tab_prop = {url: login_url, active:false};
+const login_tab_prop = {url: login_url, active:false};
 const login_inject = {file: "login.js", runAt: "document_idle"};
 
 const account_inject = {file: "account.js", runAt: "document_idle"};
 const passport_inject = {file: "passport.js", runAt: "document_idle"};
 const rewards_inject = {file: "rewards.js", runAt: "document_idle"};
+const scrape_inject = {file: "scrape.js", runAt: "document_idle"};
+
+const MaxKeywords = 100;
 
 const storage = chrome.storage.local;
 
 const CharCodeA = 'a'.charCodeAt();
-function randomWord() {
-	var s = '';
-	for (var len = 3+Math.floor(Math.random()*10); len>0; len--) {
-		s += String.fromCharCode(CharCodeA+Math.floor(Math.random()*26));
+function randomWord(words) {
+	var i = Math.floor(Math.random()*words.length);
+	if (i >= words.length) {
+		i = words.length-1;
 	}
-	return s;
+	return words[i];
 }
 
 function randomSec(low, high) {
@@ -37,8 +40,17 @@ const NaviState = {
 	email: true,
 	pass: true,
 	pendingRefresh: true,
-	tasks: true
+	tasks: true,
+	keywords: true
 };
+
+Navigator.prototype.updateKeywords = function(words) {
+	keywords.push.apply(this.keywords, words);
+	if (keywords.length > MaxKeywords) {
+		keywords.splice(0, MaxKeywords-this.keywords.length);
+	}
+	this.save();
+}
 
 Navigator.prototype.save = function(callback) {
 	const item = {};
@@ -59,6 +71,9 @@ Navigator.prototype.load = function(callback) {
 			if (NaviState[key] && nv.hasOwnProperty(key)) {
 				me[key] = nv[key];
 			}
+		}
+		if (!me.keywords || me.keywords.length<3) {
+			me.keywords = ['news', 'weather', 'sports', 'science', 'IT', 'technology', 'programming', 'language', 'open ssl', 'android', 'iphone', 'google'];
 		}
 		callback();
 	});
@@ -120,6 +135,9 @@ Navigator.prototype.init = function() {
 						//alert("rewards");
 						chrome.tabs.executeScript(me.tabid, rewards_inject);
 					});
+				} else if (req.length > 0) {
+					// a list of words
+					me.updateKeywords(req);
 				} else {
 					//alert('pending ' + me.pendingRefresh);
 					if (me.pendingRefresh>0) {
@@ -177,7 +195,7 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 	const me = this;
 	if (tasks && tasks.length > 0) {
 		const task = tasks[tasks.length-1];
-		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord()) : task.link;
+		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
 		task.amnt--;
 		if (task.amnt <= 0) {
 			tasks.pop();
@@ -199,7 +217,9 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 			});
 			//alert("delay " + delay + " " + link);
 		};
-		chrome.tabs.update(me.tabid, {url:link}, callback);
+		chrome.tabs.update(me.tabid, {url:link}, function(tab) {
+			chrome.tabs.executeScript(me.tabid, scrape_inject, callback);
+		});
 	} else {
 		// no tasks to do, close the tab
 		const tabid = me.tabid;
