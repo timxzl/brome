@@ -160,6 +160,7 @@ Navigator.prototype.init = function() {
 					const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))*1000;
 					respond(delay);
 				} else if (req.type == 'taskDone') {
+					//alert('taskDone');
 					me.taskDone();
 				} else {
 					//alert('pending ' + me.pendingRefresh);
@@ -213,6 +214,7 @@ Navigator.prototype.run = function(email, pass) {
 
 Navigator.prototype.taskDone = function() { if (this.tabid) {
 	const tasks = this.tasks;
+	const task = tasks[tasks.length-1];
 	const me = this;
 	task.amnt--;
 	if (task.amnt <= 0) {

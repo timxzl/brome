@@ -17,12 +17,14 @@ american: 1};
 dict['this'] = 1;
 dict['in'] = 1;
 
-
 function scrape() {
 	const result = [];
 	// avoid words in dict
 
 	const pars = document.getElementsByClassName('sa_mc');
+	if (!pars) {
+		return [];
+	}
 	for (var i=0; i<pars.length && i<10; i++) {
 		var p = pars[i].getElementsByTagName('p');
 		if (p && p.length>0) {
@@ -54,13 +56,15 @@ function scrape() {
 
 function task() {
 	const item = {type: 'task', words: scrape()};
-	//console.log(item.words);
+	console.log(item.words);
 	chrome.extension.sendMessage(item, function(reply) {
 		// reply is delay
-		window.settimeout(function() {
+		console.log(reply);
+		window.setTimeout(function() {
+			console.log('taskDone');
 			chrome.extension.sendMessage({type: 'taskDone'});
 		}, reply);
 	});
-});
+}
 
 task();
