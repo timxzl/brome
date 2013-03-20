@@ -1,3 +1,5 @@
+var done = false;
+
 const WordRE = /[a-z]{7,20}/g;
 
 const MaxWords = 20;
@@ -49,9 +51,16 @@ function scrape() {
 	return result;
 }
 
-const r = scrape();
-//console.log(r);
-if (r.length>0) {
-	chrome.extension.sendMessage(r);
-}
 
+function task() {
+	const item = {type: 'task', words: scrape()};
+	//console.log(item.words);
+	chrome.extension.sendMessage(item, function(reply) {
+		// reply is delay
+		window.settimeout(function() {
+			chrome.extension.sendMessage({type: 'taskDone'});
+		}, reply);
+	});
+});
+
+task();

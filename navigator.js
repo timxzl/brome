@@ -11,9 +11,9 @@ const login_inject = {file: "login.js", runAt: "document_idle"};
 const account_inject = {file: "account.js", runAt: "document_idle"};
 const passport_inject = {file: "passport.js", runAt: "document_idle"};
 const rewards_inject = {file: "rewards.js", runAt: "document_idle"};
-const scrape_inject = {file: "scrape.js", runAt: "document_idle"};
+const task_inject = {file: "task.js", runAt: "document_idle"};
 
-const MaxKeywords = 100;
+const MaxKeywords = 1000;
 
 const storage = chrome.storage.local;
 
@@ -153,9 +153,14 @@ Navigator.prototype.init = function() {
 						//alert("rewards");
 						chrome.tabs.executeScript(me.tabid, rewards_inject);
 					});
-				} else if (req.length > 0) {
-					// a list of words
-					me.updateKeywords(req);
+				} else if (req.type == 'task') {
+					if (req.words && req.words.length>0) {
+						me.updateKeywords(req);
+					}
+					const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))*1000;
+					respond(delay);
+				} else if (req.type == 'taskDone') {
+					me.taskDone();
 				} else {
 					//alert('pending ' + me.pendingRefresh);
 					if (me.pendingRefresh>0) {
@@ -178,8 +183,6 @@ Navigator.prototype.init = function() {
 			if (me.tabid) {
 				if (alarm.name == "doLogin") {
 					chrome.tabs.executeScript(me.tabid, login_inject);
-				} else if (alarm.name == "doTasks") {
-					me.doTasks();
 				}
 			}
 		});
@@ -208,35 +211,35 @@ Navigator.prototype.run = function(email, pass) {
 	});
 }
 
+Navigator.prototype.taskDone = function() { if (this.tabid) {
+	const tasks = this.tasks;
+	const me = this;
+	task.amnt--;
+	if (task.amnt <= 0) {
+		tasks.pop();
+	}
+	this.save();
+	if (tasks.length == 0) {
+		// no more tasks, should check balance again
+		chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) { if (tab.id==me.tabid) {
+			me.pendingRefresh = 3;
+			me.save();
+			chrome.tabs.executeScript(me.tabid, rewards_inject);
+		}});
+	} else {
+		// try to do another task
+		this.doTasks();
+	}
+}}
+
 Navigator.prototype.doTasks = function() { if (this.tabid) {
 	const tasks = this.tasks;
 	const me = this;
 	if (tasks && tasks.length > 0) {
 		const task = tasks[tasks.length-1];
 		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
-		task.amnt--;
-		if (task.amnt <= 0) {
-			tasks.pop();
-		}
-		this.save();
-		const callback = (tasks.length==0) ? function() {
-			chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) {
-				if (tab.id==me.tabid) {
-					me.pendingRefresh = 3;
-					me.save(function() {
-						chrome.tabs.executeScript(me.tabid, rewards_inject);
-					});
-				}
-			});
-		} : function() {
-			const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))/60.0;
-			me.save(function() {
-				chrome.alarms.create("doTasks", {delayInMinutes:delay});
-			});
-			//alert("delay " + delay + " " + link);
-		};
 		chrome.tabs.update(me.tabid, {url:link}, function(tab) {
-			chrome.tabs.executeScript(me.tabid, scrape_inject, callback);
+			chrome.tabs.executeScript(me.tabid, task_inject);
 		});
 	} else {
 		// no tasks to do, close the tab
