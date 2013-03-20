@@ -85,9 +85,11 @@ Navigator.prototype.load = function(callback) {
 	storage.get('navigator', function(data) {
 		const nv = data.navigator;
 		//alert(nv);
-		for (key in NaviState) {
-			if (NaviState[key] && nv.hasOwnProperty(key)) {
-				me[key] = nv[key];
+		if (nv) {
+			for (key in NaviState) {
+				if (NaviState[key] && nv.hasOwnProperty(key)) {
+					me[key] = nv[key];
+				}
 			}
 		}
 		if (!me.keywords || me.keywords.length<3) {
