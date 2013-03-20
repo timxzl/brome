@@ -56,12 +56,12 @@ function scrape() {
 
 function task() {
 	const item = {type: 'task', words: scrape()};
-	console.log(item.words);
+	//console.log(item.words);
 	chrome.extension.sendMessage(item, function(reply) {
 		// reply is delay
-		console.log(reply);
+		//console.log(reply);
 		window.setTimeout(function() {
-			console.log('taskDone');
+			//console.log('taskDone');
 			chrome.extension.sendMessage({type: 'taskDone'});
 		}, reply);
 	});
