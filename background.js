@@ -57,15 +57,15 @@ function MVC() {
 	this.accounts = [];
 }
 const MVCState = {
-	cur: true,
-	running: true,
-	windowId: true,
-       	iters: true,
-	wait_low: true,
-	wait_high: true,
-	gap_low: true,
-	gap_high: true,
-	accounts: true
+	cur: 1,
+	running: 1,
+	windowId: 1,
+       	iters: 2,
+	wait_low: 2,
+	wait_high: 2,
+	gap_low: 2,
+	gap_high: 2,
+	accounts: 99
 };
 
 MVC.prototype.setNavi = function(nv) {
@@ -138,6 +138,16 @@ MVC.prototype.save = function() {
 		}
 	}
 	storage.set(item);
+}
+
+MVC.prototype.clear = function(level) {
+	const keys = [];
+	for (key in MVCState) {
+		if (MVCState[key] == level) {
+			keys.push(key);
+		}
+	}
+	storage.remove(keys);
 }
 
 MVC.prototype.load = function() {
@@ -397,6 +407,14 @@ MVC.prototype.refreshControl = function() {
 			const key = this.id;
 			me[key] = this.value;
 			me.saveData(key);
+		}
+	}
+	const clears = view.getElementsByClassName('clear');
+	for (var i=0; i<clears.length; i++) {
+		var c = clears[i];
+		c.onclick = function() {
+			const level = parseInt(this.id);
+			me.clear(level);
 		}
 	}
 }
