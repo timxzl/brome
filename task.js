@@ -13,9 +13,12 @@ on: 1, of: 1, by: 1, to: 1, into: 1, onto: 1,
 take: 1, get: 1, make: 1,
 such: 1, any:1, for: 1, exist: 1, exists: 1, all: 1, none: 1,
 one: 1, two: 1, three: 1, four: 1, five: 1, six: 1, many: 1,
-american: 1};
+american: 1,
+define:1, defined:1, undefine:1};
 dict['this'] = 1;
 dict['in'] = 1;
+dict['null'] = 1;
+dict['undefined'] = 1;
 
 function scrape() {
 	const result = [];
@@ -29,6 +32,7 @@ function scrape() {
 		var p = pars[i].getElementsByTagName('p');
 		if (p && p.length>0) {
 			var words = p[0].innerText.toLowerCase().match(WordRE);
+			if (!words) return [];
 			for (var j=0; j<words.length && j<100; j++) {
 				var w = words[j];
 				//if (w.length<7) {
@@ -56,12 +60,12 @@ function scrape() {
 
 function task() {
 	const item = {type: 'task', words: scrape()};
-	//console.log(item.words);
+	console.log(item.words);
 	chrome.extension.sendMessage(item, function(reply) {
 		// reply is delay
-		//console.log(reply);
+		console.log(reply);
 		window.setTimeout(function() {
-			//console.log('taskDone');
+			console.log('taskDone');
 			chrome.extension.sendMessage({type: 'taskDone'});
 		}, reply);
 	});

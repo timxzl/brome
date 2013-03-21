@@ -157,7 +157,7 @@ Navigator.prototype.init = function() {
 					});
 				} else if (req.type == 'task') {
 					if (req.words && req.words.length>0) {
-						me.updateKeywords(req);
+						me.updateKeywords(req.words);
 					}
 					const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))*1000;
 					respond(delay);
@@ -182,9 +182,11 @@ Navigator.prototype.init = function() {
 				}
 			}
 		});
+		//alert('here dologin added');
 		chrome.alarms.onAlarm.addListener(function(alarm) {
 			if (me.tabid) {
 				if (alarm.name == "doLogin") {
+					//alert('login');
 					chrome.tabs.executeScript(me.tabid, login_inject);
 				}
 			}
@@ -243,6 +245,9 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		const task = tasks[tasks.length-1];
 		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
 		chrome.tabs.update(me.tabid, {url:link}, function(tab) {
+			if (task.link != "search") {
+				alert('task_inject ' + link);
+			}
 			chrome.tabs.executeScript(me.tabid, task_inject);
 		});
 	} else {

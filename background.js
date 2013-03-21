@@ -150,7 +150,7 @@ MVC.prototype.clear = function(level) {
 	storage.remove(keys);
 }
 
-MVC.prototype.load = function() {
+MVC.prototype.load = function(callback) {
 	const me = this;
 	storage.get(null, function(data) {
 		for (key in MVCState) {
@@ -163,6 +163,9 @@ MVC.prototype.load = function() {
 		}
 		if (me.view) {
 			me.refreshView();
+		}
+		if (callback) {
+			callback();
 		}
 	});
 }
@@ -432,17 +435,18 @@ MVC.prototype.setView = function(view) {
 }
 
 MVC.prototype.init = function() {
-	this.load();
 	const me = this;
-	chrome.alarms.onAlarm.addListener(function(alarm) {
-		if (alarm.name == 'doAll' && me.running == 'all') {
-			me.run(me.cur);
+	this.load(function() {
+		chrome.alarms.onAlarm.addListener(function(alarm) {
+			if (alarm.name == 'doAll' && me.running == 'all') {
+				me.run(me.cur);
+			}
+		});
+	// this will fail if navi is not present (usually it's not because this runs before Navigator.js, so we should put this always at the end
+		if (navi) {
+			this.setNavi(navi);
 		}
 	});
-	// this will fail if navi is not present (usually it's not because this runs before Navigator.js, so we should put this always at the end
-	if (navi) {
-		this.setNavi(navi);
-	}
 }
 
 // Singleton
