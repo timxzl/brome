@@ -27,8 +27,14 @@ function scrape() {
 	}
 	for (var i=0; i<pars.length && i<10; i++) {
 		var p = pars[i].getElementsByTagName('p');
-		if (p && p.length>0) {
+		if (!p) {
+			continue;
+		}
+		if (p.length>0) {
 			var words = p[0].innerText.toLowerCase().match(WordRE);
+			if (!words) {
+				continue;
+			}
 			for (var j=0; j<words.length && j<100; j++) {
 				var w = words[j];
 				//if (w.length<7) {
