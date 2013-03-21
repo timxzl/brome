@@ -19,7 +19,9 @@
     "webNavigation",
     "http://www.bing.com/",
     "https://login.live.com/",
-    "https://account.live.com/"
+    "https://account.live.com/",
+    "http://*.microsoft.com/",
+    "https://*.microsoft.com/"
   ],
   "browser_action": {
     "default_title": "brome",

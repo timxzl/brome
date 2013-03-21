@@ -439,7 +439,7 @@ MVC.prototype.init = function() {
 			me.run(me.cur);
 		}
 	});
-	// this will fail if navi is not present (usually it's not because this runs before Navigator.js, so we should put this always at the end
+	// this will fail if navi is not present (usually it's not because this runs before Navigator.js), so we should put this always at the end
 	if (navi) {
 		this.setNavi(navi);
 	}
