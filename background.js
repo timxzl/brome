@@ -267,7 +267,7 @@ MVC.prototype.applyChange = function(elm) {
 	}
 }
 
-MVC.prototype.refreshTab = function() {
+MVC.prototype.refreshTab = function() { if (this.view) {
 	const me = this;
 	const view = this.view;
 	const tab = view.getElementById('accounts');
@@ -394,7 +394,7 @@ MVC.prototype.refreshTab = function() {
 
 		tab.appendChild(row);
 	}
-}
+}}
 
 MVC.prototype.refreshControl = function() {
 	const me = this;
@@ -439,10 +439,6 @@ MVC.prototype.init = function() {
 			me.run(me.cur);
 		}
 	});
-	// this will fail if navi is not present (usually it's not because this runs before Navigator.js), so we should put this always at the end
-	if (navi) {
-		this.setNavi(navi);
-	}
 }
 
 // Singleton

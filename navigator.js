@@ -95,7 +95,9 @@ Navigator.prototype.load = function(callback) {
 		if (!me.keywords || me.keywords.length<3) {
 			me.keywords = ['news', 'weather', 'sports', 'science', 'technology', 'programming', 'language', 'openssl', 'android', 'iphone', 'google'];
 		}
-		callback();
+		if (callback) {
+			callback();
+		}
 	});
 }
 
@@ -157,7 +159,7 @@ Navigator.prototype.init = function() {
 					});
 				} else if (req.type == 'task') {
 					if (req.words && req.words.length>0) {
-						me.updateKeywords(req);
+						me.updateKeywords(req.words);
 					}
 					const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))*1000;
 					respond(delay);
