@@ -1,6 +1,6 @@
 const MyID = chrome.i18n.getMessage("@@extension_id");
 const login_domain = "https://login.live.com/"
-const login_url = "https://login.live.com/logout.srf?id=264960&ru=https:%2F%2Flogin.live.com";
+const login_url = "https://login.live.com/";
 const account_url = "https://account.live.com";
 const passport_url = "http://www.bing.com/Passport.aspx";
 const rewards_url = "http://www.bing.com/rewards";
@@ -145,7 +145,7 @@ Navigator.prototype.init = function() {
 				}
 			}
 		}
-		, {url: [{hostSuffix: "live.com"}, {hostSuffix: "com"}]}
+		, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]}
 		);
 		chrome.extension.onMessage.addListener(function(req, sender, respond) {
 			const tab = sender.tab;
@@ -256,7 +256,7 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		const tabid = me.tabid;
 		me.tabid = null;
 		me.save(function() {
-			chrome.tabs.remove(tabid);
+			//chrome.tabs.remove(tabid);
 			mvc.completeRun(me.email, true);
 		});
 	}
