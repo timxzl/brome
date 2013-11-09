@@ -134,14 +134,18 @@ Navigator.prototype.init = function() {
 					//alert('delay ' + delay);
 					//chrome.tabs.executeScript(me.tabid, login_inject);
 				} else if (url.indexOf(account_url)==0) {
+					//alert("account_url");
 					chrome.tabs.executeScript(me.tabid, account_inject);
 				} else if (url.indexOf(passport_url)==0) {
 					//alert("redirect:" + tabid + ":" + url);
 					chrome.tabs.executeScript(me.tabid, passport_inject);
+				} else if (url.indexOf(rewards_url) >= 0) {
+				    //alert("rewards: " + url);
+				    chrome.tabs.executeScript(me.tabid, rewards_inject);
 				}
 			}
 		}
-		, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]}
+		, {url: [{hostSuffix: "live.com"}, {hostSuffix: "com"}]}
 		);
 		chrome.extension.onMessage.addListener(function(req, sender, respond) {
 			const tab = sender.tab;

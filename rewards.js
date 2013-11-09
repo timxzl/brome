@@ -11,16 +11,16 @@ function analyzeTile(tile) {
 	if (title == "Connect to Facebook") {
 	       return null;
 	}
-	if (title == "Refer a Friend") {
+	if (title == "Invite friends") {
 		return null;
 	}
 	const progText = tile.children[2].innerText;
-	//console.log(progText);
+	console.log(progText);
 	const progress = ProgressRE.exec(progText);
 	if (!progress) {
 		return null;
 	}
-	//console.log(progress);
+	console.log(progress);
 	var times = parseInt(progress[2]) - parseInt(progress[1]);
 	var lnk;
 	if (title == "Search Bing") {
@@ -34,17 +34,20 @@ function analyzeTile(tile) {
 	} else {
 		lnk = tile.href;
 	}
-	//console.log(lnk + " " + times);
+	console.log(lnk + " " + times);
 	return {link: lnk, amnt: times};
 }
 
 
 function main() {
+	//alert("rewards main");
+	console.log("rewards main");
 	if (!done && document.readyState == "complete") {
 		done = true;
 		const bal = getBalance();
 		const tiles = document.getElementsByClassName("tile rel blk tile-height");
 		const task = [];
+		console.log("tiles.length=" + tiles.length);
 		for (var i=0; i<tiles.length; i++) {
 			var info = analyzeTile(tiles[i]);
 			if (info) {
@@ -55,11 +58,12 @@ function main() {
 				}
 			}
 		}
-		//console.log(task);
-	       	//console.log(task[0] + " " + task.length);
+		console.log(task);
+	       	console.log(task[0] + " " + task.length);
 		chrome.extension.sendMessage({balance: bal, tasks: task});
 	}
 }
 
+//alert("rewards.js");
 document.onreadystatechange = main;
 main();
