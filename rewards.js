@@ -7,14 +7,15 @@ function getBalance() {
 }
 
 function analyzeTile(tile) {
-	const title = tile.children[1].children[0].innerText;
+	var title = tile.children[1].children[0].innerText;
+	console.log("title=" + title);
 	if (title == "Connect to Facebook") {
 	       return null;
 	}
-	if (title == "Invite friends") {
+	if (title == "Invite friends" || title == "Mobile search") {
 		return null;
 	}
-	const progText = tile.children[2].innerText;
+	const progText = tile.children[3].innerText;
 	console.log(progText);
 	const progress = ProgressRE.exec(progText);
 	if (!progress) {
@@ -23,13 +24,15 @@ function analyzeTile(tile) {
 	console.log(progress);
 	var times = parseInt(progress[2]) - parseInt(progress[1]);
 	var lnk;
-	if (title == "Search Bing") {
+	if (title == "Search Bing" || title == "PC search" || title == "Today only!") {
 		lnk = "search";
-		per = PerSearchRE.exec(tile.children[1].children[1].innerText);
-		if (per) {
-			times *= parseInt(per[1]);
-		} else {
-			return null;
+		if (title == "Today only!") { times *= 2; } else {
+			per = PerSearchRE.exec(tile.children[1].children[1].innerText);
+			if (per) {
+				times *= parseInt(per[1]);
+			} else {
+				return null;
+			}
 		}
 	} else {
 		lnk = tile.href;

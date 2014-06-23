@@ -2,8 +2,9 @@ const MyID = chrome.i18n.getMessage("@@extension_id");
 const login_domain = "https://login.live.com/"
 const login_url = "https://login.live.com/";
 const account_url = "https://account.live.com";
-const passport_url = "http://www.bing.com/Passport.aspx";
-const rewards_url = "http://www.bing.com/rewards";
+const passport_url = "https://www.bing.com/Passport.aspx";
+const rewards_url = "www.bing.com/rewards";
+const rewards_redirect_url = "http://www.bing.com/rewards";
 
 const login_tab_prop = {url: login_url, active:false};
 const login_inject = {file: "login.js", runAt: "document_idle"};
@@ -231,7 +232,7 @@ Navigator.prototype.taskDone = function() { if (this.tabid) {
 	this.save();
 	if (tasks.length == 0) {
 		// no more tasks, should check balance again
-		chrome.tabs.update(me.tabid, {url: rewards_url}, function(tab) { if (tab.id==me.tabid) {
+		chrome.tabs.update(me.tabid, {url: rewards_redirect_url}, function(tab) { if (tab.id==me.tabid) {
 			me.pendingRefresh = 3;
 			me.save();
 			chrome.tabs.executeScript(me.tabid, rewards_inject);
@@ -253,8 +254,8 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		});
 	} else {
 		// no tasks to do, close the tab
-		const tabid = me.tabid;
-		me.tabid = null;
+		//const tabid = me.tabid;
+		//me.tabid = null;
 		me.save(function() {
 			//chrome.tabs.remove(tabid);
 			mvc.completeRun(me.email, true);
