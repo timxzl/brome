@@ -195,10 +195,10 @@ MVC.prototype.clearHistory = function(index) {
 }
 
 MVC.prototype.updateBalance = function(email, balance) {
-	const accounts = this.accounts;
-	const index = findEmail(accounts, email);
+	var accounts = this.accounts;
+	var index = findEmail(accounts, email);
 	if (index >= 0) {
-		history = accounts[index].history;
+		var history = accounts[index].history;
 		if (!history) {
 			history = [];
 			accounts[index].history = history;
