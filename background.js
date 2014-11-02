@@ -55,6 +55,7 @@ function MVC() {
 	this.gap_low = 1;
 	this.gap_high = 5;
 	this.accounts = [];
+	this.isMobileMode = false;
 }
 var MVCState = {
 	cur: 1,
@@ -65,7 +66,8 @@ var MVCState = {
 	wait_high: 2,
 	gap_low: 2,
 	gap_high: 2,
-	accounts: 99
+	accounts: 99,
+	isMobileMode: false
 };
 
 MVC.prototype.setNavi = function(nv) {
@@ -417,6 +419,17 @@ MVC.prototype.refreshControl = function() {
 			me.clear(level);
 		}
 	}
+	var controlChecks = view.getElementsByClassName('controlCheck');
+	for (var i=0; i<controlChecks.length; i++) {
+		var c = controlChecks[i];
+		c.checked = this[c.id];
+		c.onchange = function() {
+			var key = this.id;
+			me[key] = this.checked;
+			me.saveData(key);
+		}
+	}
+
 }
 
 MVC.prototype.refreshView = function() {

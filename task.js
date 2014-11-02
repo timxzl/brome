@@ -3,6 +3,7 @@ var done = false;
 var WordRE = /[a-z]{7,20}/g;
 
 var MaxWords = 20;
+// avoid words in dict
 var dict = {a:1, an:1, the: 1, that:1, 
 I:1, we:1, my: 1, mine: 1, our:1, ours: 1, me: 1, us: 1,
 you: 1, your: 1, yours: 1,
@@ -13,7 +14,8 @@ on: 1, of: 1, by: 1, to: 1, into: 1, onto: 1,
 take: 1, get: 1, make: 1,
 such: 1, any:1, for: 1, exist: 1, exists: 1, all: 1, none: 1,
 one: 1, two: 1, three: 1, four: 1, five: 1, six: 1, many: 1,
-american: 1};
+american: 1
+};
 dict['this'] = 1;
 dict['in'] = 1;
 
@@ -21,7 +23,7 @@ function scrape() {
 	var result = [];
 	// avoid words in dict
 
-	var pars = document.getElementsByClassName('sa_mc');
+	var pars = document.getElementsByClassName('b_snippet');
 	if (!pars) {
 		return [];
 	}
@@ -62,7 +64,7 @@ function scrape() {
 
 function task() {
 	var item = {type: 'task', words: scrape()};
-	//console.log(item.words);
+	console.log(item.words);
 	chrome.extension.sendMessage(item, function(reply) {
 		// reply is delay
 		//console.log(reply);

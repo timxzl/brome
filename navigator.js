@@ -94,7 +94,7 @@ Navigator.prototype.load = function(callback) {
 			}
 		}
 		if (!me.keywords || me.keywords.length<3) {
-			me.keywords = ['news', 'weather', 'sports', 'science', 'technology', 'programming', 'language', 'openssl', 'android', 'iphone', 'google'];
+			me.keywords = ['news', 'weather', 'sports', 'science', 'technology', 'programming', 'language', 'openssl', 'android', 'iphone', 'google', 'cycle', 'longest', 'simple', 'floid', 'umvc', 'payment'];
 		}
 		if (callback) {
 			callback();
@@ -231,6 +231,12 @@ Navigator.prototype.taskDone = function() { if (this.tabid) {
 	}
 	this.save();
 	if (tasks.length == 0) {
+		if (mvc) {
+			if (task.link == "search" && task.isMobileMode != mvc.isMobileMode) {
+				// avoid refreshing forever
+				return;
+			}
+		}
 		// no more tasks, should check balance again
 		chrome.tabs.update(me.tabid, {url: rewards_redirect_url}, function(tab) { if (tab.id==me.tabid) {
 			me.pendingRefresh = 3;
@@ -248,6 +254,13 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 	var me = this;
 	if (tasks && tasks.length > 0) {
 		var task = tasks[tasks.length-1];
+		if (mvc) {
+			if (task.link == "search" && task.isMobileMode != mvc.isMobileMode) {
+				task.amnt = 0;
+				this.taskDone();
+				return;
+			}
+		}
 		var link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
 		chrome.tabs.update(me.tabid, {url:link}, function(tab) {
 			chrome.tabs.executeScript(me.tabid, task_inject);
