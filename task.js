@@ -1,9 +1,9 @@
 var done = false;
 
-const WordRE = /[a-z]{7,20}/g;
+var WordRE = /[a-z]{7,20}/g;
 
-const MaxWords = 20;
-const dict = {a:1, an:1, the: 1, that:1, 
+var MaxWords = 20;
+var dict = {a:1, an:1, the: 1, that:1, 
 I:1, we:1, my: 1, mine: 1, our:1, ours: 1, me: 1, us: 1,
 you: 1, your: 1, yours: 1,
 he: 1, she: 1, his: 1, her: 1, hers: 1, him: 1,
@@ -18,10 +18,10 @@ dict['this'] = 1;
 dict['in'] = 1;
 
 function scrape() {
-	const result = [];
+	var result = [];
 	// avoid words in dict
 
-	const pars = document.getElementsByClassName('sa_mc');
+	var pars = document.getElementsByClassName('sa_mc');
 	if (!pars) {
 		return [];
 	}
@@ -61,7 +61,7 @@ function scrape() {
 
 
 function task() {
-	const item = {type: 'task', words: scrape()};
+	var item = {type: 'task', words: scrape()};
 	//console.log(item.words);
 	chrome.extension.sendMessage(item, function(reply) {
 		// reply is delay

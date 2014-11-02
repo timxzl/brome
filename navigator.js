@@ -1,22 +1,22 @@
-const MyID = chrome.i18n.getMessage("@@extension_id");
-const login_domain = "https://login.live.com/"
-const login_url = "https://login.live.com/";
-const account_url = "https://account.live.com";
-const passport_url = "https://www.bing.com/Passport.aspx";
-const rewards_url = "www.bing.com/rewards";
-const rewards_redirect_url = "http://www.bing.com/rewards";
+var MyID = chrome.i18n.getMessage("@@extension_id");
+var login_domain = "https://login.live.com/"
+var login_url = "https://login.live.com/";
+var account_url = "https://account.live.com";
+var passport_url = "https://www.bing.com/Passport.aspx";
+var rewards_url = "www.bing.com/rewards";
+var rewards_redirect_url = "http://www.bing.com/rewards";
 
-const login_tab_prop = {url: login_url, active:false};
-const login_inject = {file: "login.js", runAt: "document_idle"};
+var login_tab_prop = {url: login_url, active:false};
+var login_inject = {file: "login.js", runAt: "document_idle"};
 
-const account_inject = {file: "account.js", runAt: "document_idle"};
-const passport_inject = {file: "passport.js", runAt: "document_idle"};
-const rewards_inject = {file: "rewards.js", runAt: "document_idle"};
-const task_inject = {file: "task.js", runAt: "document_idle"};
+var account_inject = {file: "account.js", runAt: "document_idle"};
+var passport_inject = {file: "passport.js", runAt: "document_idle"};
+var rewards_inject = {file: "rewards.js", runAt: "document_idle"};
+var task_inject = {file: "task.js", runAt: "document_idle"};
 
-const MaxKeywords = 1000;
+var MaxKeywords = 1000;
 
-const storage = chrome.storage.local;
+var storage = chrome.storage.local;
 
 function unique(a) {
 	// a is already sorted
@@ -32,7 +32,7 @@ function unique(a) {
 	a.splice(j, a.length-j);
 }
 
-const CharCodeA = 'a'.charCodeAt();
+var CharCodeA = 'a'.charCodeAt();
 function randomWord(words) {
 	var i = Math.floor(Math.random()*words.length);
 	if (i >= words.length) {
@@ -50,7 +50,7 @@ function Navigator() {
 	// email, pass: string
 	// pendingRefresh: int
 }
-const NaviState = {
+var NaviState = {
 	tabid: true,
 	email: true,
 	pass: true,
@@ -60,7 +60,7 @@ const NaviState = {
 };
 
 Navigator.prototype.updateKeywords = function(words) {
-	const keywords = this.keywords;
+	var keywords = this.keywords;
 	keywords.push.apply(keywords, words);
 	keywords.sort();
 	unique(keywords);
@@ -72,7 +72,7 @@ Navigator.prototype.updateKeywords = function(words) {
 }
 
 Navigator.prototype.save = function(callback) {
-	const item = {};
+	var item = {};
 	for (key in NaviState) {
 		if (NaviState[key] && this.hasOwnProperty(key)) {
 			item[key] = this[key];
@@ -82,9 +82,9 @@ Navigator.prototype.save = function(callback) {
 }
 
 Navigator.prototype.load = function(callback) {
-	const me = this;
+	var me = this;
 	storage.get('navigator', function(data) {
-		const nv = data.navigator;
+		var nv = data.navigator;
 		//alert(nv);
 		if (nv) {
 			for (key in NaviState) {
@@ -104,7 +104,7 @@ Navigator.prototype.load = function(callback) {
 
 Navigator.prototype.stop = function() {
 	if (this.hasOwnProperty('tabid') && this.tabid != null) {
-		const tabid = this.tabid;
+		var tabid = this.tabid;
 		this.tabid = null;
 		this.save(null);
 		chrome.tabs.remove(tabid);
@@ -112,7 +112,7 @@ Navigator.prototype.stop = function() {
 }
 
 Navigator.prototype.init = function() {
-	const me = this;
+	var me = this;
 	this.load(function() {
 		if (mvc) {
 			mvc.setNavi(me);
@@ -126,11 +126,11 @@ Navigator.prototype.init = function() {
 			}
 		});
 		chrome.webNavigation.onCompleted.addListener(function(detail) {
-			const url = detail.url;
+			var url = detail.url;
 			if (detail.tabId == me.tabid) {
 				if (url.indexOf(login_domain)==0 && url.length-login_domain.length<10) {
 					//alert('here ' + me.tabid + ' ' + detail.tabId);
-					const delay = randomSec(parseFloat(mvc.wait_low), parseFloat(mvc.wait_high))/60.0;
+					var delay = randomSec(parseFloat(mvc.wait_low), parseFloat(mvc.wait_high))/60.0;
 					chrome.alarms.create("doLogin", {delayInMinutes:delay});
 					//alert('delay ' + delay);
 					//chrome.tabs.executeScript(me.tabid, login_inject);
@@ -149,7 +149,7 @@ Navigator.prototype.init = function() {
 		, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]}
 		);
 		chrome.extension.onMessage.addListener(function(req, sender, respond) {
-			const tab = sender.tab;
+			var tab = sender.tab;
 			//alert("req: " + req + " from: " + tab.id + " " + me.tabid + "#" + tab.url + "#" + login_url + "#" + me.email + " " + me.pass + " " + (tab.id==me.tabid) + " " + (tab.url == login_url));
 			if (sender.id == MyID && tab.id == me.tabid) {
 				if (req=="login") {
@@ -166,7 +166,7 @@ Navigator.prototype.init = function() {
 					if (req.words && req.words.length>0) {
 						me.updateKeywords(req.words);
 					}
-					const delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))*1000;
+					var delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))*1000;
 					respond(delay);
 				} else if (req.type == 'taskDone') {
 					//alert('taskDone');
@@ -200,7 +200,7 @@ Navigator.prototype.init = function() {
 }
 
 Navigator.prototype.run = function(email, pass) {
-	const me = this;
+	var me = this;
 	this.email = email;
 	this.pass = pass;
 	this.pendingRefresh = 2;
@@ -222,9 +222,9 @@ Navigator.prototype.run = function(email, pass) {
 }
 
 Navigator.prototype.taskDone = function() { if (this.tabid) {
-	const tasks = this.tasks;
-	const task = tasks[tasks.length-1];
-	const me = this;
+	var tasks = this.tasks;
+	var task = tasks[tasks.length-1];
+	var me = this;
 	task.amnt--;
 	if (task.amnt <= 0) {
 		tasks.pop();
@@ -244,17 +244,17 @@ Navigator.prototype.taskDone = function() { if (this.tabid) {
 }}
 
 Navigator.prototype.doTasks = function() { if (this.tabid) {
-	const tasks = this.tasks;
-	const me = this;
+	var tasks = this.tasks;
+	var me = this;
 	if (tasks && tasks.length > 0) {
-		const task = tasks[tasks.length-1];
-		const link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
+		var task = tasks[tasks.length-1];
+		var link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
 		chrome.tabs.update(me.tabid, {url:link}, function(tab) {
 			chrome.tabs.executeScript(me.tabid, task_inject);
 		});
 	} else {
 		// no tasks to do, close the tab
-		//const tabid = me.tabid;
+		//var tabid = me.tabid;
 		//me.tabid = null;
 		me.save(function() {
 			//chrome.tabs.remove(tabid);
@@ -264,5 +264,5 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 }}
 
 // Singleton
-const navi = new Navigator();
+var navi = new Navigator();
 navi.init();

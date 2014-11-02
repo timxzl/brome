@@ -1,6 +1,6 @@
 var done = false;
-const ProgressRE = /([0-9]+)\s+of\s+([0-9]+)\s+credit/i;
-const PerSearchRE = /per\s+([0-9]+)\s+Bing/i;
+var ProgressRE = /([0-9]+)\s+of\s+([0-9]+)\s+credit/i;
+var PerSearchRE = /per\s+([0-9]+)\s+Bing/i;
 
 function getBalance() {
 	return parseInt(document.getElementById("id_rc").innerText);
@@ -15,9 +15,9 @@ function analyzeTile(tile) {
 	if (title == "Invite friends" || title == "Mobile search") {
 		return null;
 	}
-	const progText = tile.children[3].innerText;
+	var progText = tile.children[3].innerText;
 	console.log(progText);
-	const progress = ProgressRE.exec(progText);
+	var progress = ProgressRE.exec(progText);
 	if (!progress) {
 		return null;
 	}
@@ -47,9 +47,9 @@ function main() {
 	console.log("rewards main");
 	if (!done && document.readyState == "complete") {
 		done = true;
-		const bal = getBalance();
-		const tiles = document.getElementsByClassName("tile rel blk tile-height");
-		const task = [];
+		var bal = getBalance();
+		var tiles = document.getElementsByClassName("tile rel blk tile-height");
+		var task = [];
 		console.log("tiles.length=" + tiles.length);
 		for (var i=0; i<tiles.length; i++) {
 			var info = analyzeTile(tiles[i]);

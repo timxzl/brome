@@ -1,4 +1,4 @@
-const storage = chrome.storage.local;
+var storage = chrome.storage.local;
 
 function findEmail(accounts, email) {
 	for (var i=0; i<accounts.length; i++) {
@@ -10,7 +10,7 @@ function findEmail(accounts, email) {
 }
 
 function findNextChecked(accounts, i) {
-	const end = accounts.length-1;
+	var end = accounts.length-1;
 	var j = (i>=0 && i<=end) ? i : 0;
 	do {
 		if (accounts[j].checked) {
@@ -26,7 +26,7 @@ function findNextChecked(accounts, i) {
 }
 
 function clearTab(tab) {
-	const m = tab.rows.length;
+	var m = tab.rows.length;
 	for (var i=m-1; i>=0; i--) {
 		tab.deleteRow(i);
 	}
@@ -42,7 +42,7 @@ function balanceId(index,p) {
 	return "history" + index + ":" + p;
 }
 
-const history_len = 5;
+var history_len = 5;
 function MVC() {
 // view: document
 // navi: Navigator
@@ -56,7 +56,7 @@ function MVC() {
 	this.gap_high = 5;
 	this.accounts = [];
 }
-const MVCState = {
+var MVCState = {
 	cur: 1,
 	running: 1,
 	windowId: 1,
@@ -73,7 +73,7 @@ MVC.prototype.setNavi = function(nv) {
 }
 
 MVC.prototype.run = function(i) {
-	const account = this.accounts[i];
+	var account = this.accounts[i];
 	this.cur = i;
 	if (!this.running) { this.running = true; }
 	this.saveData('cur');
@@ -83,11 +83,11 @@ MVC.prototype.run = function(i) {
 
 MVC.prototype.runall = function() {
 	this.navi.stop();
-	const accounts = this.accounts;
+	var accounts = this.accounts;
 	this.cur = findNextChecked(accounts, this.cur);
 	if (this.cur >= 0) {
 		this.running = 'all';
-		const me = this;
+		var me = this;
 		chrome.windows.getLastFocused(null, function(win) {
 			me.windowId = win.id;
 			me.save();
@@ -97,8 +97,8 @@ MVC.prototype.runall = function() {
 }
 
 MVC.prototype.completeRun = function(email, finished) {
-	const accounts = this.accounts;
-	const cur = this.cur;
+	var accounts = this.accounts;
+	var cur = this.cur;
 	if (accounts[cur].email == email) {
 		//this.view.getElementById('run' + this.cur).value = '*';
 		if (finished) {
@@ -106,7 +106,7 @@ MVC.prototype.completeRun = function(email, finished) {
 			if (this.running == 'all') {
 				this.cur = findNextChecked(accounts, cur);
 				if (this.cur >= 0) {
-					const delay = randomSec(parseFloat(this.wait_low), parseFloat(this.wait_high))/60.0;
+					var delay = randomSec(parseFloat(this.wait_low), parseFloat(this.wait_high))/60.0;
 					chrome.alarms.create("doAll", {delayInMinutes:delay});
 				}
 				else {
@@ -125,13 +125,13 @@ MVC.prototype.completeRun = function(email, finished) {
 }
 
 MVC.prototype.saveData = function(key) {
-	const item = {};
+	var item = {};
 	item[key] = this[key];
 	storage.set(item);
 }
 
 MVC.prototype.save = function() {
-	const item = {};
+	var item = {};
 	for (key in MVCState) {
 		if (MVCState[key] && this.hasOwnProperty(key)) {
 			item[key] = this[key];
@@ -141,7 +141,7 @@ MVC.prototype.save = function() {
 }
 
 MVC.prototype.clear = function(level) {
-	const keys = [];
+	var keys = [];
 	for (key in MVCState) {
 		if (MVCState[key] == level) {
 			keys.push(key);
@@ -151,7 +151,7 @@ MVC.prototype.clear = function(level) {
 }
 
 MVC.prototype.load = function() {
-	const me = this;
+	var me = this;
 	storage.get(null, function(data) {
 		for (key in MVCState) {
 			if (MVCState[key] && data.hasOwnProperty(key)) {
@@ -170,9 +170,9 @@ MVC.prototype.load = function() {
 
 
 MVC.prototype.updateHistory = function(index) {
-	const view = this.view;
+	var view = this.view;
 	if (view) {
-		const history = this.accounts[index].history;
+		var history = this.accounts[index].history;
 		for (var i=0; i<history.length; i++) {
 			var td = view.getElementById(balanceId(index, i));
 			if (td) {
@@ -185,7 +185,7 @@ MVC.prototype.updateHistory = function(index) {
 MVC.prototype.clearHistory = function(index) {
 	this.accounts[index].history = [];
 	this.saveData("accounts");
-	const view = this.view;
+	var view = this.view;
 	for (var i=0; i<history_len; i++) {
 		var td = view.getElementById(balanceId(index, i));
 		if (td) {
@@ -232,16 +232,16 @@ MVC.prototype.onChange = function(elm) {
 MVC.prototype.applyChange = function(elm) {
 	// change the model
 	//delete elm.onblur;
-	const accounts = this.accounts;
-	const index = elm.index;
-	const field = elm.field;
+	var accounts = this.accounts;
+	var index = elm.index;
+	var field = elm.field;
 	var needRefresh = false;
 
 	if (index < accounts.length) {
 		if (elm.field == 'checked') {
 			accounts[index].checked = elm.checked;
 		} else {
-			const value = elm.value;
+			var value = elm.value;
 			if (value.length == 0 && field=='email') {
 				accounts.splice(index,1);
 				needRefresh = true;
@@ -268,13 +268,13 @@ MVC.prototype.applyChange = function(elm) {
 }
 
 MVC.prototype.refreshTab = function() { if (this.view) {
-	const me = this;
-	const view = this.view;
-	const tab = view.getElementById('accounts');
-	const accounts = this.accounts;
+	var me = this;
+	var view = this.view;
+	var tab = view.getElementById('accounts');
+	var  accounts = this.accounts;
 	clearTab(tab);
-	const n = accounts.length;
-	const allcheckbox = [];
+	var n = accounts.length;
+	var allcheckbox = [];
 	for (var i=0; i <= n; i++) {
 		var account = {};
 		if (i<n) {
@@ -345,7 +345,7 @@ MVC.prototype.refreshTab = function() { if (this.view) {
 		checkbox.field = 'checked';
 		if (i==n) {
 			checkbox.onchange = function() {
-				const v = this.checked;
+				var v = this.checked;
 				for (var j=0; j<n; j++) {
 					allcheckbox[j].checked = v;
 					accounts[j].checked = v;
@@ -397,23 +397,23 @@ MVC.prototype.refreshTab = function() { if (this.view) {
 }}
 
 MVC.prototype.refreshControl = function() {
-	const me = this;
-	const view = this.view;
-	const controls = view.getElementsByClassName('control');
+	var me = this;
+	var view = this.view;
+	var controls = view.getElementsByClassName('control');
 	for (var i=0; i<controls.length; i++) {
 		var c = controls[i];
 		c.value = this[c.id];
 		c.onchange = function() {
-			const key = this.id;
+			var key = this.id;
 			me[key] = this.value;
 			me.saveData(key);
 		}
 	}
-	const clears = view.getElementsByClassName('clear');
+	var clears = view.getElementsByClassName('clear');
 	for (var i=0; i<clears.length; i++) {
 		var c = clears[i];
 		c.onclick = function() {
-			const level = parseInt(this.id);
+			var level = parseInt(this.id);
 			me.clear(level);
 		}
 	}
@@ -433,7 +433,7 @@ MVC.prototype.setView = function(view) {
 
 MVC.prototype.init = function() {
 	this.load();
-	const me = this;
+	var me = this;
 	chrome.alarms.onAlarm.addListener(function(alarm) {
 		if (alarm.name == 'doAll' && me.running == 'all') {
 			me.run(me.cur);
@@ -442,5 +442,5 @@ MVC.prototype.init = function() {
 }
 
 // Singleton
-const mvc = new MVC();
+var mvc = new MVC();
 mvc.init();

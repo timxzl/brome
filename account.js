@@ -1,4 +1,4 @@
-const rewards_url = "http://www.bing.com/rewards/dashboard";
+var rewards_url = "http://www.bing.com/rewards/dashboard";
 
 var done = false;
 
