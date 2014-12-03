@@ -33,7 +33,7 @@ function analyzeTask(elem, title, descText, progText) {
 	if (!progress) {
 		return null;
 	}
-	//console.log(progress);
+	console.log(progress);
 	var times = parseInt(progress[2]) - parseInt(progress[1]);
 	var lnk;
 	var mobile = false;
@@ -63,11 +63,11 @@ function analyzeTile(tile) {
 
 function analyzeMsg(msg) {
 	var title = msg.getElementsByClassName("offerTitle");
-	//console.log(title);
+	console.log(title);
 	var desc = msg.getElementsByClassName("desc");
-	//console.log(desc);
+	console.log(desc);
 	var progress = msg.getElementsByClassName("progress");
-	//console.log(progress);
+	console.log(progress);
 	if (title && title.length > 0 && desc && desc.length > 0 && progress && progress.length > 0) {
 		return analyzeTask(msg.parentElement, title[0].innerText, desc[0].innerText, progress[0].innerText);
 	}
@@ -87,7 +87,6 @@ function pushTask(task, info) {
 }
 
 function main() {
-	//alert("rewards main");
 	//console.log("rewards main");
 	if (!done && document.readyState == "complete") {
 		done = true;
@@ -117,6 +116,5 @@ function main() {
 	}
 }
 
-//alert("rewards.js");
 document.onreadystatechange = main;
 main();

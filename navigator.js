@@ -11,7 +11,7 @@ var login_inject = {file: "login.js", runAt: "document_idle"};
 
 var account_inject = {file: "account.js", runAt: "document_idle"};
 var passport_inject = {file: "passport.js", runAt: "document_idle"};
-var rewards_inject = {file: "rewards.js", runAt: "document_idle"};
+var rewards_inject = {"file": "rewardsinj.js", "runAt": "document_idle"};
 var task_inject = {file: "task.js", runAt: "document_idle"};
 
 var MaxKeywords = 1000;
@@ -113,7 +113,9 @@ Navigator.prototype.stop = function() {
 
 Navigator.prototype.init = function() {
 	var me = this;
+	//alert("init");
 	this.load(function() {
+		//alert("loaded");
 		if (mvc) {
 			mvc.setNavi(me);
 		}
@@ -141,12 +143,12 @@ Navigator.prototype.init = function() {
 					//alert("redirect:" + tabid + ":" + url);
 					chrome.tabs.executeScript(me.tabid, passport_inject);
 				} else if (url.indexOf(rewards_url) >= 0) {
-				    //alert("rewards: " + url);
+				    //alert("rewards: " + url + " tabid: " + me.tabid);
 				    chrome.tabs.executeScript(me.tabid, rewards_inject);
 				}
 			}
 		}
-		, {url: [{hostSuffix: "live.com"}, {hostEquals: "www.bing.com"}]}
+		, {url: [{hostSuffix: "live.com"}, {hostSuffix: "bing.com"}]}
 		);
 		chrome.extension.onMessage.addListener(function(req, sender, respond) {
 			var tab = sender.tab;
