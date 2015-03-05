@@ -1,4 +1,4 @@
-var done = false;
+var loaded = false;
 
 var WordRE = /[a-z]{7,20}/g;
 
@@ -22,23 +22,28 @@ dict['in'] = 1;
 function scrape() {
 	var result = [];
 	// avoid words in dict
+	console.log("scrape: " + window.location.href);
 
-	var pars = document.getElementsByClassName('b_snippet');
+	var pars = document.getElementsByClassName('b_caption');
 	if (!pars) {
 		return [];
 	}
+	console.log(pars);
 	for (var i=0; i<pars.length && i<10; i++) {
 		var p = pars[i].getElementsByTagName('p');
+		console.log(pars);
 		if (!p) {
 			continue;
 		}
 		if (p.length>0) {
+			console.log(p[0]);
 			var words = p[0].innerText.toLowerCase().match(WordRE);
 			if (!words) {
 				continue;
 			}
 			for (var j=0; j<words.length && j<100; j++) {
 				var w = words[j];
+				console.log(w);
 				//if (w.length<7) {
 				//	alert(w);
 				//}
@@ -63,16 +68,29 @@ function scrape() {
 
 
 function task() {
-	var item = {type: 'task', words: scrape()};
-	console.log(item.words);
+        console.log("start scrape");
+	var w = scrape();
+	console.log(w);
+	var item = {type: 'task', words: w};
+	console.log("about to send message");
 	chrome.extension.sendMessage(item, function(reply) {
 		// reply is delay
-		//console.log(reply);
+		console.log(reply);
 		window.setTimeout(function() {
-			//console.log('taskDone');
+			console.log('taskDone');
 			chrome.extension.sendMessage({type: 'taskDone'});
 		}, reply);
 	});
 }
 
-task();
+function main() {
+	console.log("in main: " + document.readyState + " " + window.location.href);
+	if (!loaded && document.readyState == "complete" && !window.location.pathname.startsWith("/reward")) {
+		loaded = true;
+		task();
+	}
+}
+
+console.log("in task.js");
+document.onreadystatechange = main;
+main();

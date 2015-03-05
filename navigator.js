@@ -165,16 +165,18 @@ Navigator.prototype.init = function() {
 						chrome.tabs.executeScript(me.tabid, rewards_inject);
 					});
 				} else if (req.type == 'task') {
+					//alert(JSON.stringify(req) + " sender: " + JSON.stringify(sender) + " respond: " + respond);
 					if (req.words && req.words.length>0) {
 						me.updateKeywords(req.words);
 					}
 					var delay = randomSec(parseFloat(mvc.gap_low), parseFloat(mvc.gap_high))*1000;
+					//alert("delay: " + delay);
 					respond(delay);
 				} else if (req.type == 'taskDone') {
 					//alert('taskDone');
 					me.taskDone();
 				} else {
-					//alert('pending ' + me.pendingRefresh);
+					//alert('pending ' + me.pendingRefresh + " req: " + JSON.stringify(req));
 					if (me.pendingRefresh>0) {
 						me.pendingRefresh--;
 						me.save(function() {
@@ -225,6 +227,7 @@ Navigator.prototype.run = function(email, pass) {
 
 Navigator.prototype.taskDone = function() { if (this.tabid) {
 	var tasks = this.tasks;
+	console.log("in taskDone: tasks.length=" + tasks.length);
 	var task = tasks[tasks.length-1];
 	var me = this;
 	task.amnt--;
@@ -232,6 +235,7 @@ Navigator.prototype.taskDone = function() { if (this.tabid) {
 		tasks.pop();
 	}
 	this.save();
+	console.log(tasks);
 	if (tasks.length == 0) {
 		if (mvc) {
 			if (task.link == "search" && task.isMobileMode != mvc.isMobileMode) {
@@ -251,11 +255,27 @@ Navigator.prototype.taskDone = function() { if (this.tabid) {
 	}
 }}
 
+function updateTabUrl(tabid, link, callback) {
+	chrome.tabs.update(tabid, {url:link}, function(tab) {
+		chrome.tabs.get(tabid, function(tab) {
+			//alert(tab.url);
+			if (tab.url.startsWith("https://www.bing.com/rewards/dashboard")) {
+				updateTabUrl(tab.id, link, callback);
+			} else {
+				callback(tab);
+			}
+		});
+	});
+}
+
 Navigator.prototype.doTasks = function() { if (this.tabid) {
 	var tasks = this.tasks;
 	var me = this;
 	if (tasks && tasks.length > 0) {
+		console.log("in doTasks: tasks.length=" + tasks.length);
 		var task = tasks[tasks.length-1];
+		console.log("in doTasks:");
+		console.log(task);
 		if (mvc) {
 			if (task.link == "search" && task.isMobileMode != mvc.isMobileMode) {
 				task.amnt = 0;
@@ -264,8 +284,8 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 			}
 		}
 		var link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
-		chrome.tabs.update(me.tabid, {url:link}, function(tab) {
-			chrome.tabs.executeScript(me.tabid, task_inject);
+		updateTabUrl(me.tabid, link, function(tab) {
+			chrome.tabs.executeScript(tab.id, task_inject);
 		});
 	} else {
 		// no tasks to do, close the tab
