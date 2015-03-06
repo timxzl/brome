@@ -75,7 +75,7 @@ function task() {
 	console.log("about to send message");
 	chrome.extension.sendMessage(item, function(reply) {
 		// reply is delay
-		console.log(reply);
+		console.log("delay: " + reply);
 		window.setTimeout(function() {
 			console.log('taskDone');
 			chrome.extension.sendMessage({type: 'taskDone'});
@@ -85,7 +85,7 @@ function task() {
 
 function main() {
 	console.log("in main: " + document.readyState + " " + window.location.href);
-	if (!loaded && document.readyState == "complete" && !window.location.pathname.startsWith("/reward")) {
+	if (!loaded && document.readyState == "complete") {
 		loaded = true;
 		task();
 	}

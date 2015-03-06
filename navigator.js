@@ -256,13 +256,22 @@ Navigator.prototype.taskDone = function() { if (this.tabid) {
 }}
 
 function updateTabUrl(tabid, link, callback) {
+	var listener = function(id, changeInfo, tab) {
+		//alert("in listener: " + id + " " + tabid + " " + JSON.stringify(changeInfo));
+		if (id == tabid && changeInfo.status == "complete") {
+			chrome.tabs.onUpdated.removeListener(listener);
+			callback(tab);
+		}
+	}
+	chrome.tabs.onUpdated.addListener(listener);
 	chrome.tabs.update(tabid, {url:link}, function(tab) {
 		chrome.tabs.get(tabid, function(tab) {
 			//alert(tab.url);
+			console.log("updateTabUrl: " + tab.url);
 			if (tab.url.startsWith("https://www.bing.com/rewards/dashboard")) {
 				updateTabUrl(tab.id, link, callback);
 			} else {
-				callback(tab);
+				//chrome.tabs.update(tab.id, {url:link}, callback);
 			}
 		});
 	});
@@ -285,6 +294,7 @@ Navigator.prototype.doTasks = function() { if (this.tabid) {
 		}
 		var link = (task.link == "search") ? ("http://www.bing.com/search?q=" + randomWord(this.keywords)) : task.link;
 		updateTabUrl(me.tabid, link, function(tab) {
+			console.log("url: " + tab.url);
 			chrome.tabs.executeScript(tab.id, task_inject);
 		});
 	} else {
