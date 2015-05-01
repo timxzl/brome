@@ -57,8 +57,10 @@ function analyzeTask(elem, title, descText, progText) {
 
 function analyzeTile(tile) {
 	var title = tile.children[1].children[0].innerText;
-	var progText = tile.children[3].innerText;
-	return analyzeTask(tile, title, tile.children[1].children[1].innerText, progText);
+	if (tile.childElementCount > 3) {
+		var progText = tile.children[3].innerText;
+		return analyzeTask(tile, title, tile.children[1].children[1].innerText, progText);
+	}
 }
 
 function analyzeMsg(msg) {
