@@ -1,7 +1,7 @@
 var MyID = chrome.i18n.getMessage("@@extension_id");
 var login_domain = "https://login.live.com/"
 var login_url = "https://login.live.com/";
-var account_url = "https://account.live.com";
+var account_url = "https://account.microsoft.com";
 var passport_url = "https://www.bing.com/Passport.aspx";
 var rewards_url = "www.bing.com/rewards";
 var rewards_redirect_url = "http://www.bing.com/rewards";
@@ -132,10 +132,9 @@ Navigator.prototype.init = function() {
 			if (detail.tabId == me.tabid) {
 				if (url.indexOf(login_domain)==0 && url.length-login_domain.length<10) {
 					//alert('here ' + me.tabid + ' ' + detail.tabId);
-					var delay = randomSec(parseFloat(mvc.wait_low), parseFloat(mvc.wait_high))/60.0;
-					chrome.alarms.create("doLogin", {delayInMinutes:delay});
-					//alert('delay ' + delay);
-					//chrome.tabs.executeScript(me.tabid, login_inject);
+					//var delay = randomSec(parseFloat(mvc.wait_low), parseFloat(mvc.wait_high))/60.0;
+					//chrome.alarms.create("doLogin", {delayInMinutes:delay});
+					chrome.tabs.executeScript(me.tabid, login_inject);
 				} else if (url.indexOf(account_url)==0) {
 					//alert("account_url");
 					chrome.tabs.executeScript(me.tabid, account_inject);
