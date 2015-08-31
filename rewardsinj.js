@@ -92,6 +92,13 @@ function main() {
 	//console.log("rewards main");
 	if (!done && document.readyState == "complete") {
 		done = true;
+		var bt = document.getElementsByClassName("bottom transition");
+		console.log(bt);
+		if (bt && bt.length > 0) {
+			var b = bt[0];
+			console.log(b);
+			b.setAttribute("class", "");
+		}
 		var bal = getBalance();
 		var task = [];
 		var tiles = document.getElementsByClassName("tile rel blk tile-height");
@@ -102,16 +109,11 @@ function main() {
 				pushTask(task, info);
 			}
 		} else {
-			var msgs = document.getElementsByClassName("message");
-			//console.log(msgs);
-			if (msgs) {
-				for (var i = 0; i < msgs.length; i++) {
-					var info = analyzeMsg(msgs[i]);
-					//console.log("info= " + info);
-					pushTask(task, info);
-				}
-			}
+			var info = {link: "search", amnt: 20, isMobileMode: true};
+			console.log("info= " + info);
+			pushTask(task, info);
 		}
+		console.log(bal);
 		console.log(task);
 	       	console.log(task[0] + " " + task.length);
 		chrome.extension.sendMessage({balance: bal, tasks: task});
